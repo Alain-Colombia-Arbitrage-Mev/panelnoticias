@@ -27,7 +27,8 @@ export default defineNuxtConfig({
   supabase: {
     url: process.env.NEXT_PUBLIC_SUPABASE_URL,
     key: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    serviceKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
+    // Usar secretKey en lugar de serviceKey (deprecado)
+    secretKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
     redirectOptions: {
       login: '/login',
       callback: '/login',
