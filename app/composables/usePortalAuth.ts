@@ -10,6 +10,7 @@ export const usePortalAuth = () => {
 
   const isAdmin = computed(() => portalUser.value?.role === 'admin')
   const isEditor = computed(() => portalUser.value?.role === 'editor' || isAdmin.value)
+  const isAuthor = computed(() => portalUser.value?.role === 'author' || isEditor.value)
 
   const fetchPortalUser = async () => {
     if (!user.value) {
@@ -29,11 +30,14 @@ export const usePortalAuth = () => {
         .single()
 
       if (fetchError) {
-        // Si no existe, intentar crear el usuario
+        // SEGURIDAD: Si no existe en la tabla usuarios, NO crear automáticamente
+        // El usuario debe ser creado manualmente por un admin
         if (fetchError.code === 'PGRST116') {
-          const newUser = await createPortalUser(user.value.email!, user.value.user_metadata?.full_name)
-          portalUser.value = newUser
-          return newUser
+          console.warn('[Security] Usuario autenticado pero no autorizado:', user.value.email)
+          // Cerrar sesión para prevenir acceso no autorizado
+          await supabase.auth.signOut()
+          error.value = 'Usuario no autorizado. Contacta al administrador.'
+          return null
         }
         throw fetchError
       }
@@ -49,85 +53,61 @@ export const usePortalAuth = () => {
     }
   }
 
-  const createPortalUser = async (email: string, name?: string) => {
-    try {
-      const { data, error: createError } = await supabase
-        .from('usuarios')
-        .insert({
-          email,
-          name: name || email.split('@')[0],
-          role: 'author',
-        })
-        .select()
-        .single()
-
-      if (createError) throw createError
-
-      return data as Usuario
-    } catch (err: any) {
-      console.error('Error creating portal user:', err)
-      return null
-    }
-  }
-
   const signIn = async (email: string, password: string) => {
     loading.value = true
     error.value = null
 
+    // Sanitizar email
+    const sanitizedEmail = email.trim().toLowerCase()
+
     try {
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email,
+        email: sanitizedEmail,
         password,
       })
 
-      if (signInError) throw signInError
+      if (signInError) {
+        // Mensajes de error genéricos para no revelar información
+        error.value = 'Credenciales inválidas'
+        return false
+      }
 
       if (data.user) {
+        // Verificar que existe en la tabla usuarios ANTES de permitir acceso
+        const { data: portalData, error: portalError } = await supabase
+          .from('usuarios')
+          .select('id, email, role')
+          .eq('email', sanitizedEmail)
+          .single()
+
+        if (portalError || !portalData) {
+          // Usuario existe en Auth pero NO en usuarios - cerrar sesión
+          console.warn('[Security] Intento de acceso no autorizado:', sanitizedEmail)
+          await supabase.auth.signOut()
+          error.value = 'Usuario no autorizado para acceder al panel'
+          return false
+        }
+
+        // Usuario válido - cargar datos completos
         await fetchPortalUser()
       }
 
       return true
     } catch (err: any) {
-      error.value = err.message
+      error.value = 'Error al iniciar sesión'
+      console.error('[Security] Login error:', err)
       return false
     } finally {
       loading.value = false
     }
   }
 
-  const signUp = async (email: string, password: string, fullName?: string) => {
-    loading.value = true
-    error.value = null
-
-    try {
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: fullName,
-          },
-        },
-      })
-
-      if (signUpError) throw signUpError
-
-      // Crear usuario en la tabla usuarios
-      if (data.user) {
-        await supabase.from('usuarios').insert({
-          email,
-          name: fullName || email.split('@')[0],
-          role: 'author',
-        })
-      }
-
-      return true
-    } catch (err: any) {
-      error.value = err.message
-      return false
-    } finally {
-      loading.value = false
-    }
+  // DESHABILITADO: El registro público está desactivado por seguridad
+  // Los usuarios deben ser creados manualmente por un administrador
+  const signUp = async (_email: string, _password: string, _fullName?: string) => {
+    error.value = 'El registro público está deshabilitado. Contacta al administrador.'
+    console.warn('[Security] Intento de registro público bloqueado')
+    return false
   }
 
   const signOut = async () => {
@@ -188,9 +168,9 @@ export const usePortalAuth = () => {
     error,
     isAdmin,
     isEditor,
+    isAuthor,
     fetchPortalUser,
     signIn,
-    signUp,
     signOut,
     updateProfile,
   }
