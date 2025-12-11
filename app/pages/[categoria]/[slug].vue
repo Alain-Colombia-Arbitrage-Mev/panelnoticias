@@ -343,3 +343,4 @@ const formatDate = (date: string) => {
   @apply bg-transparent p-0;
 }
 </style>
+

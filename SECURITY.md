@@ -58,3 +58,4 @@ Para CI/CD, usa GitHub Secrets:
 - [ ] Las claves de producción son diferentes a las de desarrollo
 - [ ] Las políticas RLS están configuradas correctamente
 - [ ] El token de GitHub no está en el código
+

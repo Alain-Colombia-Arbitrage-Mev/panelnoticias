@@ -4,7 +4,7 @@ import type { NewsPortalUser } from '~/types/database'
 
 definePageMeta({
   layout: 'admin',
-  middleware: 'auth',
+  middleware: ['auth', 'admin-only'],
 })
 
 const supabase = useSupabaseClient()

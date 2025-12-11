@@ -111,3 +111,4 @@ SELECT * FROM storage.policies;
 ### Error: "Permission denied"
 - Verifica que las políticas RLS estén configuradas correctamente
 - Asegúrate de que el usuario esté autenticado
+

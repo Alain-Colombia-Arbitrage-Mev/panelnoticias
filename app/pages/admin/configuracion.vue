@@ -3,7 +3,7 @@ import { Settings, Trash2, RefreshCw, Loader2, CheckCircle } from 'lucide-vue-ne
 
 definePageMeta({
   layout: 'admin',
-  middleware: 'auth',
+  middleware: ['auth', 'admin-only'],
 })
 
 const supabase = useSupabaseClient()
