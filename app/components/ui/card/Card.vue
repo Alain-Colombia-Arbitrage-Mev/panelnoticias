@@ -7,7 +7,7 @@ interface Props {
 }
 
 const props = defineProps<Props>()
-const classes = computed(() => cn('rounded-2xl text-card-foreground glass transition-all duration-200', props.class))
+const classes = computed(() => cn('rounded-xl text-card-foreground surface-card transition-all duration-200', props.class))
 </script>
 
 <template>

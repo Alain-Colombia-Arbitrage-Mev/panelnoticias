@@ -242,16 +242,16 @@ useHead({
       <div class="flex items-center justify-between mb-8">
         <div class="flex items-center gap-4">
           <NuxtLink to="/admin/noticias">
-            <Button variant="ghost" size="icon" class="rounded-xl">
+            <Button variant="ghost" size="icon" class="rounded-lg">
               <ArrowLeft class="h-5 w-5" />
             </Button>
           </NuxtLink>
           <div>
-            <h1 class="font-display text-3xl font-bold">Editar Noticia</h1>
+            <h1 class="text-2xl font-semibold tracking-tight">Editar Noticia</h1>
             <p class="text-muted-foreground">Modifica los detalles de la noticia</p>
           </div>
         </div>
-        <Button variant="destructive" class="rounded-xl" @click="showDeleteDialog = true">
+        <Button variant="destructive" class="rounded-lg" @click="showDeleteDialog = true">
           <Trash2 class="h-4 w-4 mr-2" />
           Eliminar
         </Button>
@@ -271,7 +271,7 @@ useHead({
                 id="title"
                 v-model="form.title"
                 placeholder="Título de la noticia"
-                class="rounded-xl"
+                class="rounded-lg"
                 required
               />
             </div>
@@ -283,7 +283,7 @@ useHead({
                 id="subtitle"
                 v-model="form.subtitle"
                 placeholder="Subtítulo opcional"
-                class="rounded-xl"
+                class="rounded-lg"
               />
             </div>
 
@@ -294,7 +294,7 @@ useHead({
                 id="excerpt"
                 v-model="form.excerpt"
                 placeholder="Breve resumen de la noticia..."
-                class="min-h-[80px] rounded-xl"
+                class="min-h-[80px] rounded-lg"
               />
             </div>
 
@@ -305,7 +305,7 @@ useHead({
                 id="content"
                 v-model="form.content"
                 placeholder="Escribe el contenido de la noticia aquí... (soporta HTML)"
-                class="min-h-[300px] rounded-xl"
+                class="min-h-[300px] rounded-lg"
                 required
               />
             </div>
@@ -324,7 +324,7 @@ useHead({
               <Label>Imagen Destacada</Label>
               <div
                 v-if="featuredImagePreview"
-                class="relative rounded-xl overflow-hidden"
+                class="relative rounded-lg overflow-hidden"
               >
                 <img
                   :src="featuredImagePreview"
@@ -335,7 +335,7 @@ useHead({
                   type="button"
                   variant="destructive"
                   size="icon"
-                  class="absolute top-2 right-2 rounded-xl"
+                  class="absolute top-2 right-2 rounded-lg"
                   @click="removeFeaturedImage"
                 >
                   <X class="h-4 w-4" />
@@ -343,7 +343,7 @@ useHead({
               </div>
               <label
                 v-else
-                class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer hover:bg-white/50 dark:hover:bg-white/5 transition-all duration-200 hover:border-primary/50"
+                class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-accent transition-colors hover:border-foreground/20"
               >
                 <Image class="h-8 w-8 text-muted-foreground mb-2" />
                 <span class="text-sm text-muted-foreground">Click para subir imagen</span>
@@ -362,18 +362,18 @@ useHead({
               <Label>Video</Label>
               <div
                 v-if="videoPreview"
-                class="relative rounded-xl overflow-hidden"
+                class="relative rounded-lg overflow-hidden"
               >
                 <video
                   :src="videoPreview"
                   controls
-                  class="w-full h-48 object-cover bg-black rounded-xl"
+                  class="w-full h-48 object-cover bg-black rounded-lg"
                 />
                 <Button
                   type="button"
                   variant="destructive"
                   size="icon"
-                  class="absolute top-2 right-2 rounded-xl"
+                  class="absolute top-2 right-2 rounded-lg"
                   @click="removeVideo"
                 >
                   <X class="h-4 w-4" />
@@ -381,7 +381,7 @@ useHead({
               </div>
               <label
                 v-else
-                class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer hover:bg-white/50 dark:hover:bg-white/5 transition-all duration-200 hover:border-primary/50"
+                class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-accent transition-colors hover:border-foreground/20"
               >
                 <Video class="h-8 w-8 text-muted-foreground mb-2" />
                 <span class="text-sm text-muted-foreground">Click para subir video</span>
@@ -400,14 +400,14 @@ useHead({
               <Label>Audio</Label>
               <div
                 v-if="audioPreview"
-                class="relative rounded-xl overflow-hidden p-4 bg-muted/30"
+                class="relative rounded-lg overflow-hidden p-4 bg-muted/30"
               >
                 <audio :src="audioPreview" controls class="w-full" />
                 <Button
                   type="button"
                   variant="destructive"
                   size="icon"
-                  class="absolute top-2 right-2 rounded-xl"
+                  class="absolute top-2 right-2 rounded-lg"
                   @click="removeAudio"
                 >
                   <X class="h-4 w-4" />
@@ -415,7 +415,7 @@ useHead({
               </div>
               <label
                 v-else
-                class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer hover:bg-white/50 dark:hover:bg-white/5 transition-all duration-200 hover:border-primary/50"
+                class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-accent transition-colors hover:border-foreground/20"
               >
                 <Music class="h-8 w-8 text-muted-foreground mb-2" />
                 <span class="text-sm text-muted-foreground">Click para subir audio</span>
@@ -444,7 +444,7 @@ useHead({
                 <select
                   id="category"
                   v-model="form.category_id"
-                  class="flex h-9 w-full rounded-xl border border-input bg-background/50 px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring backdrop-blur-sm"
+                  class="flex h-9 w-full rounded-lg border border-input bg-background px-3 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
                   required
                 >
                   <option value="">Selecciona una categoría</option>
@@ -460,7 +460,7 @@ useHead({
                 <select
                   id="status"
                   v-model="form.status"
-                  class="flex h-9 w-full rounded-xl border border-input bg-background/50 px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring backdrop-blur-sm"
+                  class="flex h-9 w-full rounded-lg border border-input bg-background px-3 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
                 >
                   <option value="draft">Borrador</option>
                   <option value="published">Publicado</option>
@@ -476,10 +476,10 @@ useHead({
                 <Input
                   v-model="keywordInput"
                   placeholder="Añadir palabra clave..."
-                  class="rounded-xl"
+                  class="rounded-lg"
                   @keydown.enter.prevent="addKeyword"
                 />
-                <Button type="button" variant="secondary" class="rounded-xl" @click="addKeyword">
+                <Button type="button" variant="secondary" class="rounded-lg" @click="addKeyword">
                   Añadir
                 </Button>
               </div>
@@ -504,7 +504,7 @@ useHead({
                 id="meta_description"
                 v-model="form.meta_description"
                 placeholder="Descripción para motores de búsqueda..."
-                class="min-h-[60px] rounded-xl"
+                class="min-h-[60px] rounded-lg"
               />
             </div>
 
@@ -516,12 +516,12 @@ useHead({
                 v-model="form.source_url"
                 placeholder="https://..."
                 type="url"
-                class="rounded-xl"
+                class="rounded-lg"
               />
             </div>
 
             <!-- Is Breaking -->
-            <div class="flex items-center justify-between p-4 rounded-xl bg-muted/30 border border-border/50">
+            <div class="flex items-center justify-between p-4 rounded-lg bg-muted/30 border border-border/50">
               <div>
                 <Label>Noticia Urgente</Label>
                 <p class="text-sm text-muted-foreground">Marcar como noticia de última hora</p>
@@ -534,11 +534,11 @@ useHead({
         <!-- Actions -->
         <div class="flex justify-end gap-3">
           <NuxtLink to="/admin/noticias">
-            <Button type="button" variant="outline" class="rounded-xl">
+            <Button type="button" variant="outline" class="rounded-lg">
               Cancelar
             </Button>
           </NuxtLink>
-          <Button type="submit" class="rounded-xl shadow-lg shadow-primary/20" :disabled="saving || uploading">
+          <Button type="submit" class="rounded-lg" :disabled="saving || uploading">
             <Loader2 v-if="saving || uploading" class="h-4 w-4 mr-2 animate-spin" />
             Guardar Cambios
           </Button>
@@ -562,10 +562,10 @@ useHead({
               </CardDescription>
             </CardHeader>
             <CardFooter class="flex justify-end gap-2">
-              <Button variant="outline" class="rounded-xl" @click="showDeleteDialog = false">
+              <Button variant="outline" class="rounded-lg" @click="showDeleteDialog = false">
                 Cancelar
               </Button>
-              <Button variant="destructive" class="rounded-xl" @click="handleDelete">
+              <Button variant="destructive" class="rounded-lg" @click="handleDelete">
                 Eliminar
               </Button>
             </CardFooter>

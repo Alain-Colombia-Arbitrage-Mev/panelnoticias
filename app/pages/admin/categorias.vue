@@ -149,10 +149,10 @@ useHead({
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
       <div>
-        <h1 class="font-display text-3xl font-bold">Categorías</h1>
+        <h1 class="text-2xl font-semibold tracking-tight">Categorías</h1>
         <p class="text-muted-foreground">Gestiona las categorías de noticias</p>
       </div>
-      <Button class="rounded-xl shadow-lg shadow-primary/20" @click="openCreateDialog">
+      <Button class="rounded-lg" @click="openCreateDialog">
         <Plus class="h-4 w-4 mr-2" />
         Nueva Categoría
       </Button>
@@ -172,7 +172,7 @@ useHead({
         <FolderOpen class="h-7 w-7 text-muted-foreground" />
       </div>
       <p class="text-muted-foreground mb-4">No hay categorías creadas</p>
-      <Button class="rounded-xl" @click="openCreateDialog">
+      <Button class="rounded-lg" @click="openCreateDialog">
         <Plus class="h-4 w-4 mr-2" />
         Crear primera categoría
       </Button>
@@ -183,10 +183,10 @@ useHead({
       <Card
         v-for="category in categories"
         :key="category.id"
-        class="group overflow-hidden hover:shadow-lg hover:-translate-y-0.5"
+        class="group overflow-hidden hover:border-foreground/10 transition-colors"
       >
         <div
-          class="h-1.5 rounded-t-2xl"
+          class="h-1 rounded-t-xl"
           :style="{ backgroundColor: category.color }"
         />
         <CardContent class="p-5">
@@ -237,7 +237,7 @@ useHead({
             <CardHeader>
               <div class="flex items-center justify-between">
                 <CardTitle>{{ editingCategory ? 'Editar' : 'Nueva' }} Categoría</CardTitle>
-                <Button variant="ghost" size="icon" class="rounded-xl" @click="showDialog = false">
+                <Button variant="ghost" size="icon" class="rounded-lg" @click="showDialog = false">
                   <X class="h-4 w-4" />
                 </Button>
               </div>
@@ -251,7 +251,7 @@ useHead({
                     id="name"
                     v-model="form.name"
                     placeholder="Nombre de la categoría"
-                    class="rounded-xl"
+                    class="rounded-lg"
                     required
                   />
                 </div>
@@ -263,7 +263,7 @@ useHead({
                     id="slug"
                     v-model="form.slug"
                     placeholder="slug-de-la-categoria"
-                    class="rounded-xl font-mono text-sm"
+                    class="rounded-lg font-mono text-sm"
                     required
                   />
                 </div>
@@ -275,7 +275,7 @@ useHead({
                     id="description"
                     v-model="form.description"
                     placeholder="Descripción opcional..."
-                    class="min-h-[80px] rounded-xl"
+                    class="min-h-[80px] rounded-lg"
                   />
                 </div>
 
@@ -287,7 +287,7 @@ useHead({
                       v-for="color in colorOptions"
                       :key="color"
                       type="button"
-                      class="w-8 h-8 rounded-xl border-2 transition-all duration-200 hover:scale-110"
+                      class="w-8 h-8 rounded-lg border-2 transition-all duration-200 hover:scale-110"
                       :class="form.color === color ? 'border-foreground scale-110 shadow-lg' : 'border-transparent'"
                       :style="{ backgroundColor: color }"
                       @click="form.color = color"
@@ -303,15 +303,15 @@ useHead({
                     v-model.number="form.display_order"
                     type="number"
                     min="0"
-                    class="rounded-xl"
+                    class="rounded-lg"
                   />
                 </div>
               </CardContent>
               <CardFooter class="flex justify-end gap-2">
-                <Button type="button" variant="outline" class="rounded-xl" @click="showDialog = false">
+                <Button type="button" variant="outline" class="rounded-lg" @click="showDialog = false">
                   Cancelar
                 </Button>
-                <Button type="submit" class="rounded-xl" :disabled="saving">
+                <Button type="submit" class="rounded-lg" :disabled="saving">
                   <Loader2 v-if="saving" class="h-4 w-4 mr-2 animate-spin" />
                   {{ editingCategory ? 'Guardar' : 'Crear' }}
                 </Button>
@@ -338,10 +338,10 @@ useHead({
               </CardDescription>
             </CardHeader>
             <CardFooter class="flex justify-end gap-2">
-              <Button variant="outline" class="rounded-xl" @click="showDeleteDialog = false">
+              <Button variant="outline" class="rounded-lg" @click="showDeleteDialog = false">
                 Cancelar
               </Button>
-              <Button variant="destructive" class="rounded-xl" @click="handleDelete">
+              <Button variant="destructive" class="rounded-lg" @click="handleDelete">
                 Eliminar
               </Button>
             </CardFooter>

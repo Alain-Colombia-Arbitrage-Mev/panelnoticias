@@ -39,7 +39,7 @@ useHead({
   <div class="max-w-2xl">
     <!-- Header -->
     <div class="mb-8">
-      <h1 class="font-display text-3xl font-bold">Configuración</h1>
+      <h1 class="text-2xl font-semibold tracking-tight">Configuración</h1>
       <p class="text-muted-foreground">Ajustes del portal de noticias</p>
     </div>
 
@@ -48,8 +48,8 @@ useHead({
       <Card class="overflow-hidden">
         <CardHeader>
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500/20 to-orange-400/20 flex items-center justify-center">
-              <Trash2 class="h-5 w-5 text-red-500" />
+            <div class="w-10 h-10 rounded-lg bg-destructive/10 flex items-center justify-center">
+              <Trash2 class="h-5 w-5 text-destructive" />
             </div>
             <div>
               <CardTitle>Limpieza Automática</CardTitle>
@@ -60,7 +60,7 @@ useHead({
           </div>
         </CardHeader>
         <CardContent class="space-y-4">
-          <div class="p-4 rounded-xl bg-muted/30 border border-border/50">
+          <div class="p-4 rounded-lg bg-muted/30 border border-border/50">
             <h4 class="font-medium mb-2 text-sm">¿Cómo funciona?</h4>
             <ul class="text-sm text-muted-foreground space-y-1.5">
               <li class="flex items-start gap-2">
@@ -84,7 +84,7 @@ useHead({
 
           <div
             v-if="cleanupResult"
-            class="p-4 rounded-xl flex items-center gap-3"
+            class="p-4 rounded-lg flex items-center gap-3"
             :class="cleanupResult.success ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-red-500/10 border border-red-500/20'"
           >
             <CheckCircle v-if="cleanupResult.success" class="h-5 w-5 text-emerald-500 shrink-0" />
@@ -100,7 +100,7 @@ useHead({
             @click="runCleanup"
             :disabled="cleanupLoading"
             variant="outline"
-            class="rounded-xl"
+            class="rounded-lg"
           >
             <Loader2 v-if="cleanupLoading" class="h-4 w-4 mr-2 animate-spin" />
             <RefreshCw v-else class="h-4 w-4 mr-2" />
@@ -113,8 +113,8 @@ useHead({
       <Card class="overflow-hidden">
         <CardHeader>
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-400/20 flex items-center justify-center">
-              <Database class="h-5 w-5 text-blue-500" />
+            <div class="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
+              <Database class="h-5 w-5 text-muted-foreground" />
             </div>
             <div>
               <CardTitle>Almacenamiento</CardTitle>
@@ -125,7 +125,7 @@ useHead({
           </div>
         </CardHeader>
         <CardContent>
-          <div class="p-4 rounded-xl bg-muted/30 border border-border/50">
+          <div class="p-4 rounded-lg bg-muted/30 border border-border/50">
             <h4 class="font-medium mb-2 text-sm">Información</h4>
             <ul class="text-sm text-muted-foreground space-y-1.5">
               <li class="flex items-start gap-2">
@@ -153,27 +153,27 @@ useHead({
       <Card class="overflow-hidden">
         <CardHeader>
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500/20 to-purple-400/20 flex items-center justify-center">
-              <Info class="h-5 w-5 text-violet-500" />
+            <div class="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
+              <Info class="h-5 w-5 text-muted-foreground" />
             </div>
             <CardTitle>Acerca del Portal</CardTitle>
           </div>
         </CardHeader>
         <CardContent>
           <div class="space-y-3">
-            <div class="flex justify-between items-center p-3 rounded-xl bg-muted/30">
+            <div class="flex justify-between items-center p-3 rounded-lg bg-muted/30">
               <span class="text-sm text-muted-foreground">Versión</span>
               <span class="text-sm font-medium">1.0.0</span>
             </div>
-            <div class="flex justify-between items-center p-3 rounded-xl bg-muted/30">
+            <div class="flex justify-between items-center p-3 rounded-lg bg-muted/30">
               <span class="text-sm text-muted-foreground">Framework</span>
               <span class="text-sm font-medium">Nuxt 4</span>
             </div>
-            <div class="flex justify-between items-center p-3 rounded-xl bg-muted/30">
+            <div class="flex justify-between items-center p-3 rounded-lg bg-muted/30">
               <span class="text-sm text-muted-foreground">UI</span>
               <span class="text-sm font-medium">shadcn-vue + Tailwind CSS</span>
             </div>
-            <div class="flex justify-between items-center p-3 rounded-xl bg-muted/30">
+            <div class="flex justify-between items-center p-3 rounded-lg bg-muted/30">
               <span class="text-sm text-muted-foreground">Backend</span>
               <span class="text-sm font-medium">Supabase</span>
             </div>

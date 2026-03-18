@@ -280,7 +280,7 @@ useHead({
       <Transition name="slide-down">
         <div
           v-if="successMessage"
-          class="fixed top-4 right-4 z-[60] glass px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 max-w-md border-emerald-500/30 bg-emerald-500/10"
+          class="fixed top-4 right-4 z-[60] px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 max-w-md border border-emerald-500/30 bg-emerald-500/10"
         >
           <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
           <span class="text-sm font-medium">{{ successMessage }}</span>
@@ -289,7 +289,7 @@ useHead({
       <Transition name="slide-down">
         <div
           v-if="errorMessage && !showCreateDialog"
-          class="fixed top-4 right-4 z-[60] glass px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 max-w-md border-destructive/30 bg-destructive/10"
+          class="fixed top-4 right-4 z-[60] px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 max-w-md border border-destructive/30 bg-destructive/10"
         >
           <div class="w-2 h-2 rounded-full bg-destructive"></div>
           <span class="text-sm font-medium text-destructive">{{ errorMessage }}</span>
@@ -302,7 +302,7 @@ useHead({
       <div class="w-16 h-16 rounded-2xl bg-muted/50 flex items-center justify-center mx-auto mb-4">
         <Shield class="h-7 w-7 text-muted-foreground" />
       </div>
-      <h2 class="font-display text-xl font-bold mb-2">Acceso Restringido</h2>
+      <h2 class="text-xl font-semibold mb-2">Acceso Restringido</h2>
       <p class="text-muted-foreground">Solo los administradores pueden gestionar usuarios.</p>
     </div>
 
@@ -310,10 +310,10 @@ useHead({
       <!-- Header -->
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
-          <h1 class="font-display text-3xl font-bold">Usuarios</h1>
+          <h1 class="text-2xl font-semibold tracking-tight">Usuarios</h1>
           <p class="text-muted-foreground">Gestiona los usuarios del portal</p>
         </div>
-        <Button class="rounded-xl shadow-lg shadow-primary/20" @click="openCreateDialog">
+        <Button class="rounded-lg" @click="openCreateDialog">
           <UserPlus class="h-4 w-4 mr-2" />
           Crear usuario
         </Button>
@@ -344,15 +344,15 @@ useHead({
               v-for="user in users"
               :key="user.id"
               :class="[
-                'flex items-center gap-4 p-4 transition-all duration-200',
-                user.is_active === false ? 'opacity-50' : 'hover:bg-white/50 dark:hover:bg-white/5',
+                'flex items-center gap-4 p-4 transition-colors',
+                user.is_active === false ? 'opacity-50' : 'hover:bg-accent',
               ]"
             >
               <!-- Avatar -->
               <div class="relative">
-                <Avatar class="h-11 w-11 ring-2 ring-primary/10">
+                <Avatar class="h-10 w-10">
                   <AvatarImage :src="user.avatar_url || ''" />
-                  <AvatarFallback class="bg-gradient-to-br from-primary/20 to-blue-400/20 text-primary font-bold">
+                  <AvatarFallback class="bg-muted text-muted-foreground text-sm font-semibold">
                     {{ (user.name || user.email).charAt(0).toUpperCase() }}
                   </AvatarFallback>
                 </Avatar>
@@ -392,20 +392,20 @@ useHead({
                   v-if="user.is_active === false"
                   variant="ghost"
                   size="icon"
-                  class="rounded-xl h-9 w-9 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-500/10"
+                  class="rounded-lg h-9 w-9 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-500/10"
                   title="Reactivar"
                   @click="handleReactivate(user)"
                 >
                   <RotateCcw class="h-4 w-4" />
                 </Button>
-                <Button variant="ghost" size="icon" class="rounded-xl h-9 w-9" title="Editar" @click="openEditDialog(user)">
+                <Button variant="ghost" size="icon" class="rounded-lg h-9 w-9" title="Editar" @click="openEditDialog(user)">
                   <Edit class="h-4 w-4" />
                 </Button>
                 <Button
                   v-if="user.is_active !== false"
                   variant="ghost"
                   size="icon"
-                  class="rounded-xl h-9 w-9 text-amber-500 hover:text-amber-600 hover:bg-amber-500/10"
+                  class="rounded-lg h-9 w-9 text-amber-500 hover:text-amber-600 hover:bg-amber-500/10"
                   title="Desactivar"
                   @click="confirmDeactivate(user)"
                 >
@@ -414,7 +414,7 @@ useHead({
                 <Button
                   variant="ghost"
                   size="icon"
-                  class="rounded-xl h-9 w-9 text-destructive hover:text-destructive hover:bg-destructive/10"
+                  class="rounded-lg h-9 w-9 text-destructive hover:text-destructive hover:bg-destructive/10"
                   title="Eliminar permanentemente"
                   @click="confirmDelete(user)"
                 >
@@ -442,12 +442,12 @@ useHead({
             <CardHeader>
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-blue-400/20 flex items-center justify-center">
-                    <UserPlus class="h-5 w-5 text-primary" />
+                  <div class="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
+                    <UserPlus class="h-5 w-5 text-muted-foreground" />
                   </div>
                   <CardTitle>Crear Usuario</CardTitle>
                 </div>
-                <Button variant="ghost" size="icon" class="rounded-xl" @click="showCreateDialog = false">
+                <Button variant="ghost" size="icon" class="rounded-lg" @click="showCreateDialog = false">
                   <X class="h-4 w-4" />
                 </Button>
               </div>
@@ -455,7 +455,7 @@ useHead({
             <form @submit.prevent="handleCreate">
               <CardContent class="space-y-4">
                 <!-- Error message inside modal -->
-                <div v-if="errorMessage" class="bg-destructive/10 text-destructive text-sm p-3 rounded-xl flex items-center gap-2">
+                <div v-if="errorMessage" class="bg-destructive/10 text-destructive text-sm p-3 rounded-lg flex items-center gap-2">
                   <AlertTriangle class="h-4 w-4 shrink-0" />
                   {{ errorMessage }}
                 </div>
@@ -468,7 +468,7 @@ useHead({
                     v-model="createForm.email"
                     type="email"
                     placeholder="usuario@ejemplo.com"
-                    class="rounded-xl"
+                    class="rounded-lg"
                     required
                   />
                 </div>
@@ -484,7 +484,7 @@ useHead({
                       placeholder="Mínimo 6 caracteres"
                       minlength="6"
                       required
-                      class="pr-10 rounded-xl"
+                      class="pr-10 rounded-lg"
                     />
                     <button
                       type="button"
@@ -501,7 +501,7 @@ useHead({
                 <div class="space-y-2">
                   <Label>Rol *</Label>
                   <Select v-model="createForm.role">
-                    <SelectTrigger class="rounded-xl">
+                    <SelectTrigger class="rounded-lg">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -513,10 +513,10 @@ useHead({
                 </div>
               </CardContent>
               <CardFooter class="flex justify-end gap-2">
-                <Button type="button" variant="outline" class="rounded-xl" @click="showCreateDialog = false">
+                <Button type="button" variant="outline" class="rounded-lg" @click="showCreateDialog = false">
                   Cancelar
                 </Button>
-                <Button type="submit" class="rounded-xl" :disabled="saving">
+                <Button type="submit" class="rounded-lg" :disabled="saving">
                   <Loader2 v-if="saving" class="h-4 w-4 mr-2 animate-spin" />
                   Crear
                 </Button>
@@ -539,7 +539,7 @@ useHead({
             <CardHeader>
               <div class="flex items-center justify-between">
                 <CardTitle>Editar Usuario</CardTitle>
-                <Button variant="ghost" size="icon" class="rounded-xl" @click="showEditDialog = false">
+                <Button variant="ghost" size="icon" class="rounded-lg" @click="showEditDialog = false">
                   <X class="h-4 w-4" />
                 </Button>
               </div>
@@ -553,7 +553,7 @@ useHead({
                     id="edit-email"
                     v-model="editForm.email"
                     disabled
-                    class="bg-muted/50 rounded-xl"
+                    class="bg-muted/50 rounded-lg"
                   />
                 </div>
 
@@ -564,7 +564,7 @@ useHead({
                     id="edit-name"
                     v-model="editForm.full_name"
                     placeholder="Nombre del usuario"
-                    class="rounded-xl"
+                    class="rounded-lg"
                   />
                 </div>
 
@@ -572,7 +572,7 @@ useHead({
                 <div class="space-y-2">
                   <Label>Rol</Label>
                   <Select v-model="editForm.role">
-                    <SelectTrigger class="rounded-xl">
+                    <SelectTrigger class="rounded-lg">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -584,10 +584,10 @@ useHead({
                 </div>
               </CardContent>
               <CardFooter class="flex justify-end gap-2">
-                <Button type="button" variant="outline" class="rounded-xl" @click="showEditDialog = false">
+                <Button type="button" variant="outline" class="rounded-lg" @click="showEditDialog = false">
                   Cancelar
                 </Button>
-                <Button type="submit" class="rounded-xl" :disabled="saving">
+                <Button type="submit" class="rounded-lg" :disabled="saving">
                   <Loader2 v-if="saving" class="h-4 w-4 mr-2 animate-spin" />
                   Guardar
                 </Button>
@@ -614,10 +614,10 @@ useHead({
               </CardDescription>
             </CardHeader>
             <CardFooter class="flex justify-end gap-2">
-              <Button variant="outline" class="rounded-xl" @click="showDeactivateDialog = false">
+              <Button variant="outline" class="rounded-lg" @click="showDeactivateDialog = false">
                 Cancelar
               </Button>
-              <Button variant="destructive" class="rounded-xl" @click="handleDeactivate">
+              <Button variant="destructive" class="rounded-lg" @click="handleDeactivate">
                 Desactivar
               </Button>
             </CardFooter>
@@ -645,10 +645,10 @@ useHead({
               </CardDescription>
             </CardHeader>
             <CardFooter class="flex justify-end gap-2">
-              <Button variant="outline" class="rounded-xl" @click="showDeleteDialog = false">
+              <Button variant="outline" class="rounded-lg" @click="showDeleteDialog = false">
                 Cancelar
               </Button>
-              <Button variant="destructive" class="rounded-xl" :disabled="saving" @click="handleDelete">
+              <Button variant="destructive" class="rounded-lg" :disabled="saving" @click="handleDelete">
                 <Loader2 v-if="saving" class="h-4 w-4 mr-2 animate-spin" />
                 Eliminar permanentemente
               </Button>

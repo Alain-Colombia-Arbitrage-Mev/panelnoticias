@@ -48,12 +48,12 @@ const isActive = (href: string) => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-background gradient-mesh">
+  <div class="min-h-screen bg-background">
     <!-- Mobile Sidebar Overlay -->
     <Transition name="fade">
       <div
         v-if="isMobileSidebarOpen"
-        class="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden"
+        class="fixed inset-0 z-40 bg-black/40 lg:hidden"
         @click="isMobileSidebarOpen = false"
       />
     </Transition>
@@ -61,42 +61,42 @@ const isActive = (href: string) => {
     <!-- Sidebar -->
     <aside
       :class="[
-        'fixed inset-y-0 left-0 z-50 flex flex-col glass-strong transition-all duration-300 rounded-r-2xl',
+        'fixed inset-y-0 left-0 z-50 flex flex-col bg-card border-r border-border transition-all duration-300',
         isSidebarOpen ? 'w-64' : 'w-[72px]',
         isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
       ]"
     >
       <!-- Logo -->
-      <div class="flex items-center h-16 px-4" :class="isSidebarOpen ? 'justify-between' : 'justify-center'">
+      <div class="flex items-center h-14 px-4 border-b border-border" :class="isSidebarOpen ? 'justify-between' : 'justify-center'">
         <NuxtLink to="/admin" class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-blue-400 flex items-center justify-center shadow-lg shadow-primary/20">
-            <Newspaper class="h-5 w-5 text-white" />
+          <div class="w-8 h-8 rounded-lg bg-foreground flex items-center justify-center">
+            <Newspaper class="h-4 w-4 text-background" />
           </div>
           <Transition name="fade">
-            <span v-if="isSidebarOpen" class="font-display text-lg font-bold bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent">
-              Panel
+            <span v-if="isSidebarOpen" class="text-sm font-semibold tracking-tight">
+              Panel de Noticias
             </span>
           </Transition>
         </NuxtLink>
       </div>
 
       <!-- Navigation -->
-      <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto scrollbar-hide">
+      <nav class="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto scrollbar-hide">
         <NuxtLink
           v-for="item in navigation"
           :key="item.name"
           :to="item.href"
           :class="[
-            'flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative',
+            'flex items-center gap-3 px-3 py-2 rounded-lg transition-colors group relative text-sm',
             isActive(item.href)
-              ? 'bg-gradient-to-r from-primary to-blue-400 text-white shadow-lg shadow-primary/25'
-              : 'text-muted-foreground hover:bg-white/50 dark:hover:bg-white/5 hover:text-foreground',
+              ? 'bg-accent text-foreground font-medium'
+              : 'text-muted-foreground hover:bg-accent/50 hover:text-foreground',
             !isSidebarOpen && 'justify-center px-0',
           ]"
           @click="isMobileSidebarOpen = false"
         >
-          <component :is="item.icon" class="h-5 w-5 shrink-0" />
-          <span v-if="isSidebarOpen" class="text-sm font-medium">{{ item.name }}</span>
+          <component :is="item.icon" class="h-4 w-4 shrink-0" />
+          <span v-if="isSidebarOpen">{{ item.name }}</span>
           <!-- Tooltip when collapsed -->
           <div
             v-if="!isSidebarOpen"
@@ -108,9 +108,9 @@ const isActive = (href: string) => {
       </nav>
 
       <!-- Collapse Toggle -->
-      <div class="px-3 py-2 hidden lg:block">
+      <div class="px-3 py-2 hidden lg:block border-t border-border">
         <button
-          class="w-full flex items-center justify-center p-2 rounded-xl text-muted-foreground hover:bg-white/50 dark:hover:bg-white/5 hover:text-foreground transition-colors"
+          class="w-full flex items-center justify-center p-2 rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
           @click="isSidebarOpen = !isSidebarOpen"
         >
           <ChevronLeft v-if="isSidebarOpen" class="h-4 w-4" />
@@ -119,26 +119,26 @@ const isActive = (href: string) => {
       </div>
 
       <!-- User Section -->
-      <div class="p-3 border-t border-white/10">
-        <div v-if="portalUser" :class="['flex items-center gap-3 p-2 rounded-xl', !isSidebarOpen && 'justify-center']">
+      <div class="p-3 border-t border-border">
+        <div v-if="portalUser" :class="['flex items-center gap-3 p-2 rounded-lg', !isSidebarOpen && 'justify-center']">
           <div class="relative">
-            <Avatar class="h-9 w-9 ring-2 ring-primary/20">
+            <Avatar class="h-8 w-8">
               <AvatarImage :src="portalUser.avatar_url || ''" />
-              <AvatarFallback class="bg-gradient-to-br from-primary to-blue-400 text-white text-sm font-bold">
+              <AvatarFallback class="bg-muted text-muted-foreground text-xs font-semibold">
                 {{ portalUser.name?.charAt(0)?.toUpperCase() || 'U' }}
               </AvatarFallback>
             </Avatar>
-            <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-green-400 border-2 border-background"></div>
+            <div class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-card"></div>
           </div>
           <div v-if="isSidebarOpen" class="flex-1 min-w-0">
-            <p class="text-sm font-semibold truncate">{{ portalUser.name || portalUser.email }}</p>
-            <p class="text-xs text-muted-foreground truncate">{{ portalUser.role }}</p>
+            <p class="text-sm font-medium truncate">{{ portalUser.name || portalUser.email }}</p>
+            <p class="text-xs text-muted-foreground truncate capitalize">{{ portalUser.role }}</p>
           </div>
         </div>
 
         <button
           :class="[
-            'w-full mt-2 flex items-center gap-2 p-2 rounded-xl text-sm text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all duration-200',
+            'w-full mt-1 flex items-center gap-2 p-2 rounded-lg text-sm text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors',
             !isSidebarOpen && 'justify-center',
           ]"
           @click="signOut"
@@ -152,18 +152,18 @@ const isActive = (href: string) => {
     <!-- Main Content -->
     <div :class="['min-h-screen transition-all duration-300', isSidebarOpen ? 'lg:ml-64' : 'lg:ml-[72px]']">
       <!-- Top Bar -->
-      <header class="sticky top-0 z-40 mx-4 mt-4 mb-2 rounded-2xl">
-        <div class="flex items-center justify-between h-14 px-4 glass rounded-2xl">
+      <header class="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b border-border">
+        <div class="flex items-center justify-between h-14 px-4 lg:px-6">
           <div class="flex items-center gap-3">
             <button
-              class="lg:hidden p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/5 transition-colors text-muted-foreground"
+              class="lg:hidden p-2 rounded-lg hover:bg-accent transition-colors text-muted-foreground"
               @click="isMobileSidebarOpen = true"
             >
               <Menu class="h-5 w-5" />
             </button>
 
             <div>
-              <h1 class="text-sm font-bold">
+              <h1 class="text-sm font-semibold">
                 {{ navigation.find(item => isActive(item.href))?.name || 'Admin' }}
               </h1>
             </div>
@@ -171,13 +171,13 @@ const isActive = (href: string) => {
 
           <div class="flex items-center gap-1">
             <button
-              class="relative p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/5 transition-colors text-muted-foreground"
+              class="relative p-2 rounded-lg hover:bg-accent transition-colors text-muted-foreground"
             >
               <Bell class="h-4 w-4" />
-              <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-primary"></span>
+              <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-destructive"></span>
             </button>
             <button
-              class="p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/5 transition-colors text-muted-foreground"
+              class="p-2 rounded-lg hover:bg-accent transition-colors text-muted-foreground"
               @click="toggleDark"
             >
               <Sun v-if="colorMode.value === 'dark'" class="h-4 w-4" />
@@ -188,7 +188,7 @@ const isActive = (href: string) => {
       </header>
 
       <!-- Page Content -->
-      <main class="px-4 pb-6 lg:px-6">
+      <main class="p-4 lg:p-6">
         <slot />
       </main>
     </div>

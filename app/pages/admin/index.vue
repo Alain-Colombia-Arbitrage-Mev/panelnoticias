@@ -62,7 +62,7 @@ const getStatusColor = (status: string) => {
     published: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400',
     draft: 'bg-amber-500/15 text-amber-600 dark:text-amber-400',
     scheduled: 'bg-blue-500/15 text-blue-600 dark:text-blue-400',
-    archived: 'bg-gray-500/15 text-gray-600 dark:text-gray-400',
+    archived: 'bg-muted text-muted-foreground',
   }
   return colors[status] || colors.draft
 }
@@ -94,73 +94,67 @@ useHead({
     <!-- Loading State -->
     <div v-if="loading" class="flex items-center justify-center min-h-[60vh]">
       <div class="relative">
-        <div class="h-12 w-12 rounded-full border-2 border-primary/20"></div>
-        <div class="absolute inset-0 h-12 w-12 rounded-full border-2 border-transparent border-t-primary animate-spin"></div>
+        <div class="h-10 w-10 rounded-full border-2 border-border"></div>
+        <div class="absolute inset-0 h-10 w-10 rounded-full border-2 border-transparent border-t-foreground animate-spin"></div>
       </div>
     </div>
 
     <template v-else>
       <!-- Welcome Section -->
       <div class="mb-8">
-        <h1 class="font-display text-3xl font-bold mb-1">
+        <h1 class="text-2xl font-semibold tracking-tight mb-1">
           {{ greeting }}<span v-if="portalUser?.name">, {{ portalUser.name.split(' ')[0] }}</span>
         </h1>
-        <p class="text-muted-foreground">Aqui tienes un resumen de tu portal de noticias.</p>
+        <p class="text-muted-foreground text-sm">Aqui tienes un resumen de tu portal de noticias.</p>
       </div>
 
       <!-- Stats Grid -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <!-- Total Articles -->
-        <Card class="group hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-0.5">
+        <Card class="hover:border-foreground/10 transition-colors">
           <CardContent class="p-5">
-            <div class="flex items-start justify-between mb-4">
-              <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-primary/20 to-blue-400/20 flex items-center justify-center">
-                <FileText class="h-5 w-5 text-primary" />
-              </div>
-              <span class="text-xs text-muted-foreground font-medium px-2 py-1 rounded-full bg-muted/50">Total</span>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-sm text-muted-foreground font-medium">Articulos</span>
+              <FileText class="h-4 w-4 text-muted-foreground" />
             </div>
-            <p class="text-3xl font-bold tracking-tight">{{ formatNumber(stats.totalArticles) }}</p>
-            <p class="text-sm text-muted-foreground mt-1">Articulos</p>
+            <p class="text-2xl font-semibold tracking-tight">{{ formatNumber(stats.totalArticles) }}</p>
+            <p class="text-xs text-muted-foreground mt-1">Total en el sistema</p>
           </CardContent>
         </Card>
 
         <!-- Published -->
-        <Card class="group hover:shadow-lg hover:shadow-emerald-500/5 hover:-translate-y-0.5">
+        <Card class="hover:border-foreground/10 transition-colors">
           <CardContent class="p-5">
-            <div class="flex items-start justify-between mb-4">
-              <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-500/20 to-green-400/20 flex items-center justify-center">
-                <TrendingUp class="h-5 w-5 text-emerald-500" />
-              </div>
-              <span class="text-xs text-emerald-600 dark:text-emerald-400 font-medium px-2 py-1 rounded-full bg-emerald-500/10">Activos</span>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-sm text-muted-foreground font-medium">Publicados</span>
+              <TrendingUp class="h-4 w-4 text-emerald-500" />
             </div>
-            <p class="text-3xl font-bold tracking-tight">{{ formatNumber(stats.publishedArticles) }}</p>
-            <p class="text-sm text-muted-foreground mt-1">Publicados</p>
+            <p class="text-2xl font-semibold tracking-tight">{{ formatNumber(stats.publishedArticles) }}</p>
+            <p class="text-xs text-muted-foreground mt-1">Activos ahora</p>
           </CardContent>
         </Card>
 
         <!-- Views -->
-        <Card class="group hover:shadow-lg hover:shadow-violet-500/5 hover:-translate-y-0.5">
+        <Card class="hover:border-foreground/10 transition-colors">
           <CardContent class="p-5">
-            <div class="flex items-start justify-between mb-4">
-              <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-violet-500/20 to-purple-400/20 flex items-center justify-center">
-                <Eye class="h-5 w-5 text-violet-500" />
-              </div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-sm text-muted-foreground font-medium">Vistas</span>
+              <Eye class="h-4 w-4 text-muted-foreground" />
             </div>
-            <p class="text-3xl font-bold tracking-tight">{{ formatNumber(stats.totalViews) }}</p>
-            <p class="text-sm text-muted-foreground mt-1">Vistas totales</p>
+            <p class="text-2xl font-semibold tracking-tight">{{ formatNumber(stats.totalViews) }}</p>
+            <p class="text-xs text-muted-foreground mt-1">Vistas totales</p>
           </CardContent>
         </Card>
 
         <!-- Categories -->
-        <Card class="group hover:shadow-lg hover:shadow-amber-500/5 hover:-translate-y-0.5">
+        <Card class="hover:border-foreground/10 transition-colors">
           <CardContent class="p-5">
-            <div class="flex items-start justify-between mb-4">
-              <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-400/20 flex items-center justify-center">
-                <FolderOpen class="h-5 w-5 text-amber-500" />
-              </div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-sm text-muted-foreground font-medium">Categorias</span>
+              <FolderOpen class="h-4 w-4 text-muted-foreground" />
             </div>
-            <p class="text-3xl font-bold tracking-tight">{{ formatNumber(stats.totalCategories) }}</p>
-            <p class="text-sm text-muted-foreground mt-1">Categorias</p>
+            <p class="text-2xl font-semibold tracking-tight">{{ formatNumber(stats.totalCategories) }}</p>
+            <p class="text-xs text-muted-foreground mt-1">Categorias activas</p>
           </CardContent>
         </Card>
       </div>
@@ -168,34 +162,34 @@ useHead({
       <!-- Quick Actions & Recent Articles -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <!-- Quick Actions -->
-        <div class="space-y-4">
+        <div class="space-y-3">
           <NuxtLink to="/admin/noticias/nueva" class="block group">
-            <Card class="hover:shadow-lg hover:shadow-primary/10 hover:-translate-y-0.5">
-              <CardContent class="p-5">
-                <div class="flex items-center gap-4">
-                  <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-blue-400 flex items-center justify-center shadow-lg shadow-primary/25">
-                    <Plus class="h-6 w-6 text-white" />
+            <Card class="hover:border-foreground/10 transition-colors">
+              <CardContent class="p-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-foreground flex items-center justify-center">
+                    <Plus class="h-5 w-5 text-background" />
                   </div>
                   <div class="flex-1">
-                    <p class="font-semibold">Nueva Noticia</p>
-                    <p class="text-sm text-muted-foreground">Crear un articulo</p>
+                    <p class="text-sm font-medium">Nueva Noticia</p>
+                    <p class="text-xs text-muted-foreground">Crear un articulo</p>
                   </div>
-                  <ArrowUpRight class="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                  <ArrowUpRight class="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
                 </div>
               </CardContent>
             </Card>
           </NuxtLink>
 
           <NuxtLink to="/admin/noticias" class="block group">
-            <Card class="hover:shadow-lg hover:-translate-y-0.5">
-              <CardContent class="p-5">
-                <div class="flex items-center gap-4">
-                  <div class="w-12 h-12 rounded-xl bg-muted/50 flex items-center justify-center">
-                    <FileText class="h-5 w-5 text-muted-foreground" />
+            <Card class="hover:border-foreground/10 transition-colors">
+              <CardContent class="p-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
+                    <FileText class="h-4 w-4 text-muted-foreground" />
                   </div>
                   <div class="flex-1">
-                    <p class="font-semibold">Todas las Noticias</p>
-                    <p class="text-sm text-muted-foreground">{{ stats.totalArticles }} articulos</p>
+                    <p class="text-sm font-medium">Todas las Noticias</p>
+                    <p class="text-xs text-muted-foreground">{{ stats.totalArticles }} articulos</p>
                   </div>
                   <ArrowUpRight class="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
                 </div>
@@ -204,15 +198,15 @@ useHead({
           </NuxtLink>
 
           <NuxtLink to="/admin/categorias" class="block group">
-            <Card class="hover:shadow-lg hover:-translate-y-0.5">
-              <CardContent class="p-5">
-                <div class="flex items-center gap-4">
-                  <div class="w-12 h-12 rounded-xl bg-muted/50 flex items-center justify-center">
-                    <FolderOpen class="h-5 w-5 text-muted-foreground" />
+            <Card class="hover:border-foreground/10 transition-colors">
+              <CardContent class="p-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
+                    <FolderOpen class="h-4 w-4 text-muted-foreground" />
                   </div>
                   <div class="flex-1">
-                    <p class="font-semibold">Categorias</p>
-                    <p class="text-sm text-muted-foreground">{{ stats.totalCategories }} categorias</p>
+                    <p class="text-sm font-medium">Categorias</p>
+                    <p class="text-xs text-muted-foreground">{{ stats.totalCategories }} categorias</p>
                   </div>
                   <ArrowUpRight class="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
                 </div>
@@ -226,7 +220,7 @@ useHead({
           <CardHeader class="flex flex-row items-center justify-between pb-4">
             <div class="flex items-center gap-2">
               <Clock class="h-4 w-4 text-muted-foreground" />
-              <CardTitle class="text-base">Articulos Recientes</CardTitle>
+              <CardTitle class="text-sm font-medium">Articulos Recientes</CardTitle>
             </div>
             <NuxtLink to="/admin/noticias">
               <Button variant="ghost" size="sm" class="text-xs h-8 rounded-lg">
@@ -236,15 +230,15 @@ useHead({
             </NuxtLink>
           </CardHeader>
           <CardContent>
-            <div v-if="recentArticles.length > 0" class="space-y-1">
+            <div v-if="recentArticles.length > 0" class="space-y-0.5">
               <NuxtLink
                 v-for="article in recentArticles"
                 :key="article.id"
                 :to="`/admin/noticias/${article.id}`"
-                class="flex items-center justify-between p-3 rounded-xl hover:bg-white/50 dark:hover:bg-white/5 transition-all duration-200 group"
+                class="flex items-center justify-between p-3 rounded-lg hover:bg-accent transition-colors group"
               >
                 <div class="flex-1 min-w-0">
-                  <p class="font-medium text-sm line-clamp-1 group-hover:text-primary transition-colors">
+                  <p class="font-medium text-sm line-clamp-1 group-hover:text-foreground transition-colors">
                     {{ article.title }}
                   </p>
                   <div class="flex items-center gap-3 text-xs text-muted-foreground mt-1">
@@ -261,12 +255,12 @@ useHead({
               </NuxtLink>
             </div>
             <div v-else class="text-center py-12">
-              <div class="w-16 h-16 rounded-2xl bg-muted/50 flex items-center justify-center mx-auto mb-4">
-                <Zap class="h-7 w-7 text-muted-foreground" />
+              <div class="w-12 h-12 rounded-xl bg-muted flex items-center justify-center mx-auto mb-3">
+                <Zap class="h-5 w-5 text-muted-foreground" />
               </div>
               <p class="text-muted-foreground text-sm">No hay articulos aun</p>
               <NuxtLink to="/admin/noticias/nueva">
-                <Button size="sm" class="mt-4 rounded-xl">
+                <Button size="sm" class="mt-3 rounded-lg">
                   <Plus class="h-4 w-4 mr-1" />
                   Crear el primero
                 </Button>

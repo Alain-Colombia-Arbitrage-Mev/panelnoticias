@@ -107,33 +107,33 @@ useHead({
 </script>
 
 <template>
-  <div class="min-h-screen flex bg-background gradient-mesh">
+  <div class="min-h-screen flex bg-background">
     <!-- Left Side - Form -->
     <div class="flex-1 flex items-center justify-center p-8">
-      <div class="w-full max-w-md">
+      <div class="w-full max-w-sm">
         <!-- Logo -->
-        <div class="flex items-center gap-3 mb-10">
-          <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-blue-400 flex items-center justify-center shadow-lg shadow-primary/20">
-            <Newspaper class="h-6 w-6 text-white" />
+        <div class="flex items-center gap-2.5 mb-10">
+          <div class="w-9 h-9 rounded-lg bg-foreground flex items-center justify-center">
+            <Newspaper class="h-4.5 w-4.5 text-background" />
           </div>
-          <span class="font-display text-2xl font-bold bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent">
+          <span class="text-lg font-semibold tracking-tight">
             Panel de Noticias
           </span>
         </div>
 
         <!-- Title -->
         <div class="mb-8">
-          <h1 class="font-display text-3xl font-bold mb-2">
-            Acceso Administrativo
+          <h1 class="text-2xl font-semibold tracking-tight mb-2">
+            Iniciar Sesion
           </h1>
-          <p class="text-muted-foreground">
+          <p class="text-sm text-muted-foreground">
             Ingresa tus credenciales para acceder al panel
           </p>
         </div>
 
         <!-- Blocked Warning -->
-        <div v-if="isBlocked" class="mb-6 p-4 rounded-xl glass border-destructive/20 flex items-start gap-3">
-          <ShieldAlert class="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+        <div v-if="isBlocked" class="mb-6 p-3 rounded-lg bg-destructive/10 border border-destructive/20 flex items-start gap-3">
+          <ShieldAlert class="h-4 w-4 text-destructive shrink-0 mt-0.5" />
           <div>
             <p class="text-destructive font-medium text-sm">Cuenta bloqueada temporalmente</p>
             <p class="text-destructive/80 text-xs mt-0.5">Demasiados intentos fallidos. Espera {{ blockTimer }} segundos.</p>
@@ -141,21 +141,21 @@ useHead({
         </div>
 
         <!-- Error Messages -->
-        <div v-else-if="error || formError" class="mb-6 p-4 rounded-xl glass border-destructive/20 text-destructive text-sm flex items-center gap-2">
+        <div v-else-if="error || formError" class="mb-6 p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm flex items-center gap-2">
           <ShieldAlert class="h-4 w-4 shrink-0" />
           {{ error || formError }}
         </div>
 
         <!-- Remaining Attempts Warning -->
-        <div v-if="loginAttempts > 2 && loginAttempts < 5 && !isBlocked" class="mb-4 p-3 rounded-xl glass border-amber-500/20 text-amber-600 dark:text-amber-400 text-sm">
+        <div v-if="loginAttempts > 2 && loginAttempts < 5 && !isBlocked" class="mb-4 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-sm">
           Te quedan {{ 5 - loginAttempts }} intentos antes del bloqueo temporal
         </div>
 
         <!-- Form -->
-        <form @submit.prevent="handleSubmit" class="space-y-5" autocomplete="off">
+        <form @submit.prevent="handleSubmit" class="space-y-4" autocomplete="off">
           <!-- Email -->
           <div class="space-y-2">
-            <Label for="email" class="text-sm font-medium">Correo electrónico</Label>
+            <Label for="email" class="text-sm font-medium">Correo electronico</Label>
             <Input
               id="email"
               v-model="form.email"
@@ -164,7 +164,7 @@ useHead({
               autocomplete="username"
               required
               :disabled="isBlocked"
-              class="lowercase rounded-xl h-11"
+              class="lowercase rounded-lg h-10"
             />
           </div>
 
@@ -180,7 +180,7 @@ useHead({
                 autocomplete="current-password"
                 required
                 :disabled="isBlocked"
-                class="pr-10 rounded-xl h-11"
+                class="pr-10 rounded-lg h-10"
                 @paste="handlePaste"
               />
               <button
@@ -196,18 +196,18 @@ useHead({
           </div>
 
           <!-- Submit Button -->
-          <Button type="submit" class="w-full rounded-xl h-11 shadow-lg shadow-primary/20" :disabled="loading || isBlocked">
+          <Button type="submit" class="w-full rounded-lg h-10" :disabled="loading || isBlocked">
             <Loader2 v-if="loading" class="h-4 w-4 animate-spin mr-2" />
             <ShieldAlert v-else-if="isBlocked" class="h-4 w-4 mr-2" />
-            {{ isBlocked ? 'Bloqueado' : 'Iniciar Sesión' }}
+            {{ isBlocked ? 'Bloqueado' : 'Iniciar Sesion' }}
           </Button>
         </form>
 
         <!-- Security Notice -->
-        <div class="mt-8 p-4 rounded-xl glass">
-          <p class="text-xs text-muted-foreground text-center flex items-center justify-center gap-2">
-            <Lock class="h-3.5 w-3.5" />
-            Conexión segura. Solo usuarios autorizados pueden acceder.
+        <div class="mt-8 pt-6 border-t border-border">
+          <p class="text-xs text-muted-foreground text-center flex items-center justify-center gap-1.5">
+            <Lock class="h-3 w-3" />
+            Conexion segura. Solo usuarios autorizados.
           </p>
         </div>
 
@@ -215,36 +215,31 @@ useHead({
     </div>
 
     <!-- Right Side - Decorative -->
-    <div class="hidden lg:flex flex-1 relative overflow-hidden items-center justify-center p-12">
-      <!-- Glass background -->
-      <div class="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-blue-400"></div>
-      <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.15),transparent_50%)]"></div>
-      <div class="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(255,255,255,0.1),transparent_50%)]"></div>
-
-      <div class="relative max-w-lg text-white">
-        <h2 class="font-display text-4xl font-bold mb-6">
-          Panel de Administración
+    <div class="hidden lg:flex flex-1 relative overflow-hidden items-center justify-center bg-foreground">
+      <div class="relative max-w-md text-background px-12">
+        <h2 class="text-3xl font-semibold tracking-tight mb-4">
+          Panel de Administracion
         </h2>
-        <p class="text-white/80 text-lg mb-8">
+        <p class="text-background/60 mb-8">
           Gestiona tu portal de noticias de forma segura.
           Publica, edita y administra contenido multimedia.
         </p>
-        <div class="grid grid-cols-2 gap-4">
-          <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-5 border border-white/10">
-            <Lock class="h-7 w-7 mb-3 text-white/90" />
-            <div class="text-white/70 text-sm">Acceso seguro</div>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="bg-background/10 rounded-lg p-4">
+            <Lock class="h-5 w-5 mb-2 text-background/70" />
+            <div class="text-background/60 text-sm">Acceso seguro</div>
           </div>
-          <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-5 border border-white/10">
-            <BarChart3 class="h-7 w-7 mb-3 text-white/90" />
-            <div class="text-white/70 text-sm">Control total</div>
+          <div class="bg-background/10 rounded-lg p-4">
+            <BarChart3 class="h-5 w-5 mb-2 text-background/70" />
+            <div class="text-background/60 text-sm">Control total</div>
           </div>
-          <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-5 border border-white/10">
-            <Zap class="h-7 w-7 mb-3 text-white/90" />
-            <div class="text-white/70 text-sm">Ultra rápido</div>
+          <div class="bg-background/10 rounded-lg p-4">
+            <Zap class="h-5 w-5 mb-2 text-background/70" />
+            <div class="text-background/60 text-sm">Ultra rapido</div>
           </div>
-          <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-5 border border-white/10">
-            <Shield class="h-7 w-7 mb-3 text-white/90" />
-            <div class="text-white/70 text-sm">RLS protegido</div>
+          <div class="bg-background/10 rounded-lg p-4">
+            <Shield class="h-5 w-5 mb-2 text-background/70" />
+            <div class="text-background/60 text-sm">RLS protegido</div>
           </div>
         </div>
       </div>

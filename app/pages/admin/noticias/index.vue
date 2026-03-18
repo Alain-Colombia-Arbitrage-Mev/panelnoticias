@@ -119,11 +119,11 @@ useHead({
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
       <div>
-        <h1 class="font-display text-3xl font-bold">Noticias</h1>
+        <h1 class="text-2xl font-semibold tracking-tight">Noticias</h1>
         <p class="text-muted-foreground">Gestiona todas las noticias del portal</p>
       </div>
       <NuxtLink to="/admin/noticias/nueva">
-        <Button class="rounded-xl shadow-lg shadow-primary/20">
+        <Button class="rounded-lg">
           <Plus class="h-4 w-4 mr-2" />
           Nueva Noticia
         </Button>
@@ -140,14 +140,14 @@ useHead({
             <Input
               v-model="searchQuery"
               placeholder="Buscar noticias..."
-              class="pl-10 rounded-xl"
+              class="pl-10 rounded-lg"
             />
           </div>
 
           <!-- Status Filter -->
           <select
             v-model="selectedStatus"
-            class="h-9 w-full sm:w-[180px] rounded-xl border border-input bg-background/50 px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring backdrop-blur-sm"
+            class="h-9 w-full sm:w-[180px] rounded-lg border border-input bg-background px-3 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
           >
             <option value="">Todos los estados</option>
             <option value="published">Publicados</option>
@@ -159,7 +159,7 @@ useHead({
           <!-- Category Filter -->
           <select
             v-model="selectedCategory"
-            class="h-9 w-full sm:w-[180px] rounded-xl border border-input bg-background/50 px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring backdrop-blur-sm"
+            class="h-9 w-full sm:w-[180px] rounded-lg border border-input bg-background px-3 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
           >
             <option value="">Todas las categorías</option>
             <option v-for="cat in categories" :key="cat.id" :value="cat.id">
@@ -188,7 +188,7 @@ useHead({
           </div>
           <p class="text-muted-foreground mb-4">No hay noticias que coincidan con tu búsqueda</p>
           <NuxtLink to="/admin/noticias/nueva">
-            <Button class="rounded-xl">
+            <Button class="rounded-lg">
               <Plus class="h-4 w-4 mr-2" />
               Crear primera noticia
             </Button>
@@ -201,10 +201,10 @@ useHead({
             v-for="article in filteredArticles"
             :key="article.id"
             :to="`/admin/noticias/${article.id}`"
-            class="flex items-center gap-4 p-4 hover:bg-white/50 dark:hover:bg-white/5 transition-all duration-200 group"
+            class="flex items-center gap-4 p-4 hover:bg-accent transition-colors group"
           >
             <!-- Thumbnail -->
-            <div class="w-20 h-14 rounded-xl overflow-hidden shrink-0 bg-muted/50">
+            <div class="w-20 h-14 rounded-lg overflow-hidden shrink-0 bg-muted/50">
               <img
                 v-if="article.image_url"
                 :src="article.image_url"
@@ -251,14 +251,14 @@ useHead({
             <!-- Actions -->
             <div class="flex items-center gap-1 shrink-0" @click.prevent>
               <NuxtLink :to="`/admin/noticias/${article.id}`">
-                <Button variant="ghost" size="icon" class="rounded-xl h-9 w-9" title="Editar">
+                <Button variant="ghost" size="icon" class="rounded-lg h-9 w-9" title="Editar">
                   <Edit class="h-4 w-4" />
                 </Button>
               </NuxtLink>
               <Button
                 variant="ghost"
                 size="icon"
-                class="rounded-xl h-9 w-9 text-destructive hover:text-destructive hover:bg-destructive/10"
+                class="rounded-lg h-9 w-9 text-destructive hover:text-destructive hover:bg-destructive/10"
                 title="Eliminar"
                 @click="confirmDelete(article)"
               >
@@ -286,10 +286,10 @@ useHead({
               </CardDescription>
             </CardHeader>
             <CardFooter class="flex justify-end gap-2">
-              <Button variant="outline" class="rounded-xl" @click="showDeleteDialog = false">
+              <Button variant="outline" class="rounded-lg" @click="showDeleteDialog = false">
                 Cancelar
               </Button>
-              <Button variant="destructive" class="rounded-xl" @click="handleDelete">
+              <Button variant="destructive" class="rounded-lg" @click="handleDelete">
                 Eliminar
               </Button>
             </CardFooter>
