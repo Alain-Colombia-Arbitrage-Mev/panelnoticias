@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrowLeft, X, Image, Video, Music, Loader2, Trash2 } from 'lucide-vue-next'
+import { ArrowLeft, X, Image, Video, Music, Loader2, Trash2, Eye } from 'lucide-vue-next'
 import type { Noticia, UpdateNoticiaInput } from '~/types/database'
 
 definePageMeta({
@@ -251,10 +251,17 @@ useHead({
             <p class="text-muted-foreground">Modifica los detalles de la noticia</p>
           </div>
         </div>
-        <Button variant="destructive" class="rounded-lg" @click="showDeleteDialog = true">
-          <Trash2 class="h-4 w-4 mr-2" />
-          Eliminar
-        </Button>
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-2 text-sm text-muted-foreground px-3 py-1.5 rounded-lg bg-muted">
+            <Eye class="h-4 w-4" />
+            <span class="font-medium">{{ article.views || 0 }}</span>
+            <span>vistas</span>
+          </div>
+          <Button variant="destructive" class="rounded-lg" @click="showDeleteDialog = true">
+            <Trash2 class="h-4 w-4 mr-2" />
+            Eliminar
+          </Button>
+        </div>
       </div>
 
       <form @submit.prevent="handleSubmit" class="space-y-6">

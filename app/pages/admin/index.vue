@@ -6,7 +6,6 @@ definePageMeta({
   middleware: 'auth',
 })
 
-const supabase = useSupabaseClient()
 const { portalUser } = usePortalAuth()
 
 const stats = ref({
@@ -21,22 +20,29 @@ const loading = ref(true)
 
 onMounted(async () => {
   try {
-    const [articlesCount, publishedCount, viewsSum, categoriesCount, recent] = await Promise.all([
-      supabase.from('noticias').select('id', { count: 'exact', head: true }),
-      supabase.from('noticias').select('id', { count: 'exact', head: true }).eq('status', 'published'),
-      supabase.from('noticias').select('views'),
-      supabase.from('categorias').select('id', { count: 'exact', head: true }),
-      supabase.from('noticias').select('id, title, status, views, created_at').order('created_at', { ascending: false }).limit(5),
-    ])
+    const session = useSupabaseSession()
+    const token = session.value?.access_token
 
-    stats.value = {
-      totalArticles: articlesCount.count || 0,
-      publishedArticles: publishedCount.count || 0,
-      totalViews: viewsSum.data?.reduce((acc, curr) => acc + (curr.views || 0), 0) || 0,
-      totalCategories: categoriesCount.count || 0,
+    if (!token) {
+      console.error('No session token available')
+      loading.value = false
+      return
     }
 
-    recentArticles.value = recent.data || []
+    const data = await $fetch('/api/admin/stats', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+
+    stats.value = {
+      totalArticles: data.totalArticles,
+      publishedArticles: data.publishedArticles,
+      totalViews: data.totalViews,
+      totalCategories: data.totalCategories,
+    }
+
+    recentArticles.value = data.recentArticles
   } catch (error) {
     console.error('Error loading dashboard:', error)
   } finally {
