@@ -11,14 +11,14 @@ definePageMeta({
 const router = useRouter()
 const { createArticle, loading: saving } = useNewsArticles()
 const { categories, fetchCategories } = useCategories()
-const { 
-  uploadImage, 
-  uploadVideo, 
-  uploadAudio, 
-  uploading, 
-  uploadProgress, 
+const {
+  uploadImage,
+  uploadVideo,
+  uploadAudio,
+  uploading,
+  uploadProgress,
   error: uploadError,
-  clearError: clearUploadError 
+  clearError: clearUploadError
 } = useFileUpload()
 const { portalUser, fetchPortalUser } = usePortalAuth()
 
@@ -65,7 +65,6 @@ const handleFeaturedImageChange = async (event: Event) => {
   const file = target.files?.[0]
   if (file) {
     clearUploadError()
-    // Validación rápida antes de mostrar preview
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
     if (!allowedTypes.includes(file.type)) {
       alert('Tipo de archivo no permitido. Solo se permiten imágenes: JPG, PNG, GIF, WebP')
@@ -94,7 +93,6 @@ const handleVideoChange = async (event: Event) => {
   const file = target.files?.[0]
   if (file) {
     clearUploadError()
-    // Validación rápida antes de mostrar preview
     const allowedTypes = ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime']
     if (!allowedTypes.includes(file.type)) {
       alert('Tipo de archivo no permitido. Solo se permiten videos: MP4, WebM, OGG')
@@ -123,7 +121,6 @@ const handleAudioChange = async (event: Event) => {
   const file = target.files?.[0]
   if (file) {
     clearUploadError()
-    // Validación rápida antes de mostrar preview
     const allowedTypes = ['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/ogg', 'audio/webm']
     if (!allowedTypes.includes(file.type)) {
       alert('Tipo de archivo no permitido. Solo se permiten audios: MP3, WAV, OGG, WebM')
@@ -249,14 +246,14 @@ useHead({
 <template>
   <div class="max-w-4xl">
     <!-- Header -->
-    <div class="flex items-center gap-4 mb-6">
+    <div class="flex items-center gap-4 mb-8">
       <NuxtLink to="/admin/noticias">
-        <Button variant="ghost" size="icon">
+        <Button variant="ghost" size="icon" class="rounded-xl">
           <ArrowLeft class="h-5 w-5" />
         </Button>
       </NuxtLink>
       <div>
-        <h1 class="font-display text-2xl font-bold">Nueva Noticia</h1>
+        <h1 class="font-display text-3xl font-bold">Nueva Noticia</h1>
         <p class="text-muted-foreground">Crea una nueva noticia para el portal</p>
       </div>
     </div>
@@ -275,6 +272,7 @@ useHead({
               id="title"
               v-model="form.title"
               placeholder="Título de la noticia"
+              class="rounded-xl"
               required
             />
           </div>
@@ -286,6 +284,7 @@ useHead({
               id="subtitle"
               v-model="form.subtitle"
               placeholder="Subtítulo opcional"
+              class="rounded-xl"
             />
           </div>
 
@@ -296,7 +295,7 @@ useHead({
               id="excerpt"
               v-model="form.excerpt"
               placeholder="Breve resumen de la noticia..."
-              class="min-h-[80px]"
+              class="min-h-[80px] rounded-xl"
             />
           </div>
 
@@ -307,7 +306,7 @@ useHead({
               id="content"
               v-model="form.content"
               placeholder="Escribe el contenido de la noticia aquí... (soporta HTML)"
-              class="min-h-[300px]"
+              class="min-h-[300px] rounded-xl"
               required
             />
           </div>
@@ -326,7 +325,7 @@ useHead({
             <Label>Imagen Destacada</Label>
             <div
               v-if="featuredImagePreview"
-              class="relative rounded-lg overflow-hidden"
+              class="relative rounded-xl overflow-hidden"
             >
               <img
                 :src="featuredImagePreview"
@@ -337,7 +336,7 @@ useHead({
                 type="button"
                 variant="destructive"
                 size="icon"
-                class="absolute top-2 right-2"
+                class="absolute top-2 right-2 rounded-xl"
                 @click="removeFeaturedImage"
                 :disabled="uploading"
               >
@@ -345,13 +344,13 @@ useHead({
               </Button>
             </div>
             <div v-else-if="uploading" class="space-y-2">
-              <div class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg bg-accent/50">
+              <div class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl bg-muted/30">
                 <Loader2 class="h-8 w-8 text-primary mb-2 animate-spin" />
                 <span class="text-sm text-muted-foreground">Subiendo imagen...</span>
                 <div class="w-full max-w-xs mt-2">
-                  <div class="h-2 bg-secondary rounded-full overflow-hidden">
-                    <div 
-                      class="h-full bg-primary transition-all duration-300"
+                  <div class="h-1.5 bg-muted rounded-full overflow-hidden">
+                    <div
+                      class="h-full bg-primary rounded-full transition-all duration-300"
                       :style="{ width: `${uploadProgress}%` }"
                     />
                   </div>
@@ -360,7 +359,7 @@ useHead({
             </div>
             <label
               v-else
-              class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-accent/50 transition-colors"
+              class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer hover:bg-white/50 dark:hover:bg-white/5 transition-all duration-200 hover:border-primary/50"
             >
               <Image class="h-8 w-8 text-muted-foreground mb-2" />
               <span class="text-sm text-muted-foreground">Click para subir imagen</span>
@@ -383,18 +382,18 @@ useHead({
             <Label>Video</Label>
             <div
               v-if="videoPreview"
-              class="relative rounded-lg overflow-hidden"
+              class="relative rounded-xl overflow-hidden"
             >
               <video
                 :src="videoPreview"
                 controls
-                class="w-full h-48 object-cover bg-black"
+                class="w-full h-48 object-cover bg-black rounded-xl"
               />
               <Button
                 type="button"
                 variant="destructive"
                 size="icon"
-                class="absolute top-2 right-2"
+                class="absolute top-2 right-2 rounded-xl"
                 @click="removeVideo"
                 :disabled="uploading"
               >
@@ -402,13 +401,13 @@ useHead({
               </Button>
             </div>
             <div v-else-if="uploading" class="space-y-2">
-              <div class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg bg-accent/50">
+              <div class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl bg-muted/30">
                 <Loader2 class="h-8 w-8 text-primary mb-2 animate-spin" />
                 <span class="text-sm text-muted-foreground">Subiendo video...</span>
                 <div class="w-full max-w-xs mt-2">
-                  <div class="h-2 bg-secondary rounded-full overflow-hidden">
-                    <div 
-                      class="h-full bg-primary transition-all duration-300"
+                  <div class="h-1.5 bg-muted rounded-full overflow-hidden">
+                    <div
+                      class="h-full bg-primary rounded-full transition-all duration-300"
                       :style="{ width: `${uploadProgress}%` }"
                     />
                   </div>
@@ -417,7 +416,7 @@ useHead({
             </div>
             <label
               v-else
-              class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-accent/50 transition-colors"
+              class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer hover:bg-white/50 dark:hover:bg-white/5 transition-all duration-200 hover:border-primary/50"
             >
               <Video class="h-8 w-8 text-muted-foreground mb-2" />
               <span class="text-sm text-muted-foreground">Click para subir video</span>
@@ -440,14 +439,14 @@ useHead({
             <Label>Audio</Label>
             <div
               v-if="audioPreview"
-              class="relative rounded-lg overflow-hidden p-4 bg-accent"
+              class="relative rounded-xl overflow-hidden p-4 bg-muted/30"
             >
               <audio :src="audioPreview" controls class="w-full" />
               <Button
                 type="button"
                 variant="destructive"
                 size="icon"
-                class="absolute top-2 right-2"
+                class="absolute top-2 right-2 rounded-xl"
                 @click="removeAudio"
                 :disabled="uploading"
               >
@@ -455,13 +454,13 @@ useHead({
               </Button>
             </div>
             <div v-else-if="uploading" class="space-y-2">
-              <div class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg bg-accent/50">
+              <div class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl bg-muted/30">
                 <Loader2 class="h-8 w-8 text-primary mb-2 animate-spin" />
                 <span class="text-sm text-muted-foreground">Subiendo audio...</span>
                 <div class="w-full max-w-xs mt-2">
-                  <div class="h-2 bg-secondary rounded-full overflow-hidden">
-                    <div 
-                      class="h-full bg-primary transition-all duration-300"
+                  <div class="h-1.5 bg-muted rounded-full overflow-hidden">
+                    <div
+                      class="h-full bg-primary rounded-full transition-all duration-300"
                       :style="{ width: `${uploadProgress}%` }"
                     />
                   </div>
@@ -470,7 +469,7 @@ useHead({
             </div>
             <label
               v-else
-              class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-accent/50 transition-colors"
+              class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer hover:bg-white/50 dark:hover:bg-white/5 transition-all duration-200 hover:border-primary/50"
             >
               <Music class="h-8 w-8 text-muted-foreground mb-2" />
               <span class="text-sm text-muted-foreground">Click para subir audio</span>
@@ -503,7 +502,7 @@ useHead({
               <select
                 id="category"
                 v-model="form.category_id"
-                class="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                class="flex h-9 w-full rounded-xl border border-input bg-background/50 px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring backdrop-blur-sm"
                 required
               >
                 <option value="">Selecciona una categoría</option>
@@ -519,7 +518,7 @@ useHead({
               <select
                 id="status"
                 v-model="form.status"
-                class="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                class="flex h-9 w-full rounded-xl border border-input bg-background/50 px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring backdrop-blur-sm"
               >
                 <option value="draft">Borrador</option>
                 <option value="published">Publicar ahora</option>
@@ -535,9 +534,10 @@ useHead({
               <Input
                 v-model="keywordInput"
                 placeholder="Añadir palabra clave..."
+                class="rounded-xl"
                 @keydown.enter.prevent="addKeyword"
               />
-              <Button type="button" variant="secondary" @click="addKeyword">
+              <Button type="button" variant="secondary" class="rounded-xl" @click="addKeyword">
                 Añadir
               </Button>
             </div>
@@ -546,7 +546,7 @@ useHead({
                 v-for="keyword in form.keywords"
                 :key="keyword"
                 variant="secondary"
-                class="cursor-pointer"
+                class="cursor-pointer rounded-lg"
                 @click="removeKeyword(keyword)"
               >
                 {{ keyword }}
@@ -562,7 +562,7 @@ useHead({
               id="meta_description"
               v-model="form.meta_description"
               placeholder="Descripción para motores de búsqueda..."
-              class="min-h-[60px]"
+              class="min-h-[60px] rounded-xl"
             />
           </div>
 
@@ -574,11 +574,12 @@ useHead({
               v-model="form.source_url"
               placeholder="https://..."
               type="url"
+              class="rounded-xl"
             />
           </div>
 
           <!-- Is Breaking -->
-          <div class="flex items-center justify-between">
+          <div class="flex items-center justify-between p-4 rounded-xl bg-muted/30 border border-border/50">
             <div>
               <Label>Noticia Urgente</Label>
               <p class="text-sm text-muted-foreground">Marcar como noticia de última hora</p>
@@ -589,13 +590,13 @@ useHead({
       </Card>
 
       <!-- Actions -->
-      <div class="flex justify-end gap-4">
+      <div class="flex justify-end gap-3">
         <NuxtLink to="/admin/noticias">
-          <Button type="button" variant="outline">
+          <Button type="button" variant="outline" class="rounded-xl">
             Cancelar
           </Button>
         </NuxtLink>
-        <Button type="submit" :disabled="saving || uploading">
+        <Button type="submit" class="rounded-xl shadow-lg shadow-primary/20" :disabled="saving || uploading">
           <Loader2 v-if="saving || uploading" class="h-4 w-4 mr-2 animate-spin" />
           {{ form.status === 'published' ? 'Publicar' : 'Guardar' }}
         </Button>

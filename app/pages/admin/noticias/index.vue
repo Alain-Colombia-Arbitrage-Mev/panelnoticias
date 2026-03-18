@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Plus, Search, Filter, Eye, Edit, Trash2, MoreHorizontal } from 'lucide-vue-next'
+import { Plus, Search, Eye, Edit, Trash2, FileText, Zap } from 'lucide-vue-next'
 import type { Noticia } from '~/types/database'
 
 definePageMeta({
@@ -40,8 +40,7 @@ watch([selectedStatus, selectedCategory], () => {
 
 const filteredArticles = computed(() => {
   let result = articles.value
-  
-  // Filtrar por búsqueda
+
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
     result = result.filter(article =>
@@ -49,13 +48,12 @@ const filteredArticles = computed(() => {
       article.excerpt?.toLowerCase().includes(query)
     )
   }
-  
-  // Filtrar por tipo de fuente
+
   if (selectedSourceType.value !== '') {
     const sourceType = parseInt(selectedSourceType.value)
     result = result.filter(article => article.source_type === sourceType)
   }
-  
+
   return result
 })
 
@@ -75,10 +73,10 @@ const formatViews = (views: number) => {
 
 const getStatusColor = (status: string) => {
   const colors: Record<string, string> = {
-    published: 'bg-green-500/10 text-green-500',
-    draft: 'bg-yellow-500/10 text-yellow-500',
-    scheduled: 'bg-blue-500/10 text-blue-500',
-    archived: 'bg-gray-500/10 text-gray-500',
+    published: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400',
+    draft: 'bg-amber-500/15 text-amber-600 dark:text-amber-400',
+    scheduled: 'bg-blue-500/15 text-blue-600 dark:text-blue-400',
+    archived: 'bg-gray-500/15 text-gray-600 dark:text-gray-400',
   }
   return colors[status] || colors.draft
 }
@@ -119,13 +117,13 @@ useHead({
 <template>
   <div>
     <!-- Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
       <div>
-        <h1 class="font-display text-2xl font-bold">Noticias</h1>
+        <h1 class="font-display text-3xl font-bold">Noticias</h1>
         <p class="text-muted-foreground">Gestiona todas las noticias del portal</p>
       </div>
       <NuxtLink to="/admin/noticias/nueva">
-        <Button>
+        <Button class="rounded-xl shadow-lg shadow-primary/20">
           <Plus class="h-4 w-4 mr-2" />
           Nueva Noticia
         </Button>
@@ -135,21 +133,21 @@ useHead({
     <!-- Filters -->
     <Card class="mb-6">
       <CardContent class="p-4">
-        <div class="flex flex-col sm:flex-row gap-4">
+        <div class="flex flex-col sm:flex-row gap-3">
           <!-- Search -->
           <div class="relative flex-1">
             <Search class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               v-model="searchQuery"
               placeholder="Buscar noticias..."
-              class="pl-10"
+              class="pl-10 rounded-xl"
             />
           </div>
 
           <!-- Status Filter -->
           <select
             v-model="selectedStatus"
-            class="h-9 w-full sm:w-[180px] rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+            class="h-9 w-full sm:w-[180px] rounded-xl border border-input bg-background/50 px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring backdrop-blur-sm"
           >
             <option value="">Todos los estados</option>
             <option value="published">Publicados</option>
@@ -161,7 +159,7 @@ useHead({
           <!-- Category Filter -->
           <select
             v-model="selectedCategory"
-            class="h-9 w-full sm:w-[180px] rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+            class="h-9 w-full sm:w-[180px] rounded-xl border border-input bg-background/50 px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring backdrop-blur-sm"
           >
             <option value="">Todas las categorías</option>
             <option v-for="cat in categories" :key="cat.id" :value="cat.id">
@@ -175,67 +173,72 @@ useHead({
     <!-- Articles List -->
     <Card>
       <CardContent class="p-0">
-        <div v-if="loading" class="flex items-center justify-center py-12">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <!-- Loading -->
+        <div v-if="loading" class="flex items-center justify-center py-16">
+          <div class="relative">
+            <div class="h-10 w-10 rounded-full border-2 border-primary/20"></div>
+            <div class="absolute inset-0 h-10 w-10 rounded-full border-2 border-transparent border-t-primary animate-spin"></div>
+          </div>
         </div>
 
-        <div v-else-if="filteredArticles.length === 0" class="text-center py-12">
+        <!-- Empty State -->
+        <div v-else-if="filteredArticles.length === 0" class="text-center py-16">
+          <div class="w-16 h-16 rounded-2xl bg-muted/50 flex items-center justify-center mx-auto mb-4">
+            <Zap class="h-7 w-7 text-muted-foreground" />
+          </div>
           <p class="text-muted-foreground mb-4">No hay noticias que coincidan con tu búsqueda</p>
           <NuxtLink to="/admin/noticias/nueva">
-            <Button>
+            <Button class="rounded-xl">
               <Plus class="h-4 w-4 mr-2" />
               Crear primera noticia
             </Button>
           </NuxtLink>
         </div>
 
-        <div v-else class="divide-y">
-          <div
+        <!-- Articles -->
+        <div v-else class="divide-y divide-border/50">
+          <NuxtLink
             v-for="article in filteredArticles"
             :key="article.id"
-            class="flex items-center gap-4 p-4 hover:bg-accent/50 transition-colors"
+            :to="`/admin/noticias/${article.id}`"
+            class="flex items-center gap-4 p-4 hover:bg-white/50 dark:hover:bg-white/5 transition-all duration-200 group"
           >
             <!-- Thumbnail -->
-            <div class="w-20 h-14 rounded-lg overflow-hidden shrink-0 bg-muted">
+            <div class="w-20 h-14 rounded-xl overflow-hidden shrink-0 bg-muted/50">
               <img
                 v-if="article.image_url"
                 :src="article.image_url"
                 :alt="article.title"
-                class="w-full h-full object-cover"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               />
             </div>
 
             <!-- Content -->
             <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-2 mb-1">
-                <NuxtLink
-                  :to="`/admin/noticias/${article.id}`"
-                  class="font-medium hover:text-primary transition-colors line-clamp-1"
-                >
+              <div class="flex items-center gap-2 mb-1 flex-wrap">
+                <span class="font-medium text-sm group-hover:text-primary transition-colors line-clamp-1">
                   {{ article.title }}
-                </NuxtLink>
-                <Badge :class="getStatusColor(article.status)" class="shrink-0">
+                </span>
+                <Badge :class="[getStatusColor(article.status), 'text-xs font-medium shrink-0']">
                   {{ getStatusLabel(article.status) }}
                 </Badge>
-                <Badge 
-                  v-if="article.source_type === 1" 
-                  class="bg-blue-500/10 text-blue-500 shrink-0"
-                  title="Noticia creada manualmente"
+                <Badge
+                  v-if="article.source_type === 1"
+                  class="bg-blue-500/15 text-blue-600 dark:text-blue-400 shrink-0 text-xs"
                 >
                   Manual
                 </Badge>
-                <Badge 
-                  v-else 
-                  class="bg-purple-500/10 text-purple-500 shrink-0"
-                  title="Noticia del scraper automático"
+                <Badge
+                  v-else
+                  class="bg-violet-500/15 text-violet-600 dark:text-violet-400 shrink-0 text-xs"
                 >
                   Auto
                 </Badge>
-                <Badge v-if="article.is_breaking" class="bg-red-500/10 text-red-500 shrink-0">
+                <Badge v-if="article.is_breaking" class="bg-red-500/15 text-red-600 dark:text-red-400 shrink-0 text-xs">
                   Urgente
                 </Badge>
               </div>
-              <div class="flex items-center gap-4 text-sm text-muted-foreground">
+              <div class="flex items-center gap-4 text-xs text-muted-foreground">
                 <span v-if="article.categoria">{{ article.categoria.name }}</span>
                 <span>{{ formatDate(article.created_at) }}</span>
                 <span class="flex items-center gap-1">
@@ -246,52 +249,64 @@ useHead({
             </div>
 
             <!-- Actions -->
-            <div class="flex items-center gap-1 shrink-0">
+            <div class="flex items-center gap-1 shrink-0" @click.prevent>
               <NuxtLink :to="`/admin/noticias/${article.id}`">
-                <Button variant="ghost" size="icon" title="Editar">
+                <Button variant="ghost" size="icon" class="rounded-xl h-9 w-9" title="Editar">
                   <Edit class="h-4 w-4" />
                 </Button>
               </NuxtLink>
-              <Button 
-                variant="ghost" 
-                size="icon" 
+              <Button
+                variant="ghost"
+                size="icon"
+                class="rounded-xl h-9 w-9 text-destructive hover:text-destructive hover:bg-destructive/10"
                 title="Eliminar"
-                class="text-destructive hover:text-destructive hover:bg-destructive/10"
                 @click="confirmDelete(article)"
               >
                 <Trash2 class="h-4 w-4" />
               </Button>
             </div>
-          </div>
+          </NuxtLink>
         </div>
       </CardContent>
     </Card>
 
     <!-- Delete Confirmation Dialog -->
     <Teleport to="body">
-      <div
-        v-if="showDeleteDialog"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-        @click.self="showDeleteDialog = false"
-      >
-        <Card class="w-full max-w-md mx-4">
-          <CardHeader>
-            <CardTitle>Eliminar Noticia</CardTitle>
-            <CardDescription>
-              ¿Estás seguro de que deseas eliminar "{{ articleToDelete?.title }}"? Esta acción no se puede deshacer.
-            </CardDescription>
-          </CardHeader>
-          <CardFooter class="flex justify-end gap-2">
-            <Button variant="outline" @click="showDeleteDialog = false">
-              Cancelar
-            </Button>
-            <Button variant="destructive" @click="handleDelete">
-              Eliminar
-            </Button>
-          </CardFooter>
-        </Card>
-      </div>
+      <Transition name="fade">
+        <div
+          v-if="showDeleteDialog"
+          class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+          @click.self="showDeleteDialog = false"
+        >
+          <Card class="w-full max-w-md mx-4 shadow-2xl">
+            <CardHeader>
+              <CardTitle>Eliminar Noticia</CardTitle>
+              <CardDescription>
+                ¿Estás seguro de que deseas eliminar "{{ articleToDelete?.title }}"? Esta acción no se puede deshacer.
+              </CardDescription>
+            </CardHeader>
+            <CardFooter class="flex justify-end gap-2">
+              <Button variant="outline" class="rounded-xl" @click="showDeleteDialog = false">
+                Cancelar
+              </Button>
+              <Button variant="destructive" class="rounded-xl" @click="handleDelete">
+                Eliminar
+              </Button>
+            </CardFooter>
+          </Card>
+        </div>
+      </Transition>
     </Teleport>
   </div>
 </template>
 
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>

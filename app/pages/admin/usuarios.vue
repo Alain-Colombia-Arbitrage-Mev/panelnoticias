@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Plus, Edit, Trash2, X, Loader2, Shield, UserPlus, Eye, EyeOff, AlertTriangle } from 'lucide-vue-next'
+import { Plus, Edit, Trash2, X, Loader2, Shield, UserPlus, Eye, EyeOff, AlertTriangle, RotateCcw, Users } from 'lucide-vue-next'
 import type { NewsPortalUser } from '~/types/database'
 
 definePageMeta({
@@ -240,9 +240,9 @@ const handleDelete = async () => {
 
 const getRoleColor = (role: string) => {
   const colors: Record<string, string> = {
-    admin: 'bg-red-500/10 text-red-500',
-    editor: 'bg-blue-500/10 text-blue-500',
-    viewer: 'bg-gray-500/10 text-gray-500',
+    admin: 'bg-red-500/15 text-red-600 dark:text-red-400',
+    editor: 'bg-blue-500/15 text-blue-600 dark:text-blue-400',
+    viewer: 'bg-gray-500/15 text-gray-600 dark:text-gray-400',
   }
   return colors[role] || colors.viewer
 }
@@ -280,36 +280,40 @@ useHead({
       <Transition name="slide-down">
         <div
           v-if="successMessage"
-          class="fixed top-4 right-4 z-[60] bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 max-w-md"
+          class="fixed top-4 right-4 z-[60] glass px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 max-w-md border-emerald-500/30 bg-emerald-500/10"
         >
-          <span>{{ successMessage }}</span>
+          <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+          <span class="text-sm font-medium">{{ successMessage }}</span>
         </div>
       </Transition>
       <Transition name="slide-down">
         <div
           v-if="errorMessage && !showCreateDialog"
-          class="fixed top-4 right-4 z-[60] bg-destructive text-destructive-foreground px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 max-w-md"
+          class="fixed top-4 right-4 z-[60] glass px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 max-w-md border-destructive/30 bg-destructive/10"
         >
-          <span>{{ errorMessage }}</span>
+          <div class="w-2 h-2 rounded-full bg-destructive"></div>
+          <span class="text-sm font-medium text-destructive">{{ errorMessage }}</span>
         </div>
       </Transition>
     </Teleport>
 
     <!-- Access Check -->
-    <div v-if="!isAdmin" class="text-center py-12">
-      <Shield class="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+    <div v-if="!isAdmin" class="text-center py-16">
+      <div class="w-16 h-16 rounded-2xl bg-muted/50 flex items-center justify-center mx-auto mb-4">
+        <Shield class="h-7 w-7 text-muted-foreground" />
+      </div>
       <h2 class="font-display text-xl font-bold mb-2">Acceso Restringido</h2>
       <p class="text-muted-foreground">Solo los administradores pueden gestionar usuarios.</p>
     </div>
 
     <template v-else>
       <!-- Header -->
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
-          <h1 class="font-display text-2xl font-bold">Usuarios</h1>
+          <h1 class="font-display text-3xl font-bold">Usuarios</h1>
           <p class="text-muted-foreground">Gestiona los usuarios del portal</p>
         </div>
-        <Button @click="openCreateDialog">
+        <Button class="rounded-xl shadow-lg shadow-primary/20" @click="openCreateDialog">
           <UserPlus class="h-4 w-4 mr-2" />
           Crear usuario
         </Button>
@@ -318,38 +322,65 @@ useHead({
       <!-- Users List -->
       <Card>
         <CardContent class="p-0">
-          <div v-if="loading" class="flex items-center justify-center py-12">
-            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <!-- Loading -->
+          <div v-if="loading" class="flex items-center justify-center py-16">
+            <div class="relative">
+              <div class="h-10 w-10 rounded-full border-2 border-primary/20"></div>
+              <div class="absolute inset-0 h-10 w-10 rounded-full border-2 border-transparent border-t-primary animate-spin"></div>
+            </div>
           </div>
 
-          <div v-else-if="users.length === 0" class="text-center py-12">
+          <!-- Empty State -->
+          <div v-else-if="users.length === 0" class="text-center py-16">
+            <div class="w-16 h-16 rounded-2xl bg-muted/50 flex items-center justify-center mx-auto mb-4">
+              <Users class="h-7 w-7 text-muted-foreground" />
+            </div>
             <p class="text-muted-foreground">No hay usuarios registrados</p>
           </div>
 
-          <div v-else class="divide-y">
+          <!-- Users -->
+          <div v-else class="divide-y divide-border/50">
             <div
               v-for="user in users"
               :key="user.id"
-              class="flex items-center gap-4 p-4 hover:bg-accent/50 transition-colors"
+              :class="[
+                'flex items-center gap-4 p-4 transition-all duration-200',
+                user.is_active === false ? 'opacity-50' : 'hover:bg-white/50 dark:hover:bg-white/5',
+              ]"
             >
               <!-- Avatar -->
-              <Avatar class="h-12 w-12">
-                <AvatarImage :src="user.avatar_url || ''" />
-                <AvatarFallback>{{ (user.name || user.email).charAt(0).toUpperCase() }}</AvatarFallback>
-              </Avatar>
+              <div class="relative">
+                <Avatar class="h-11 w-11 ring-2 ring-primary/10">
+                  <AvatarImage :src="user.avatar_url || ''" />
+                  <AvatarFallback class="bg-gradient-to-br from-primary/20 to-blue-400/20 text-primary font-bold">
+                    {{ (user.name || user.email).charAt(0).toUpperCase() }}
+                  </AvatarFallback>
+                </Avatar>
+                <div
+                  v-if="user.is_active !== false"
+                  class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-400 border-2 border-background"
+                ></div>
+                <div
+                  v-else
+                  class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-gray-400 border-2 border-background"
+                ></div>
+              </div>
 
               <!-- Info -->
               <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-2 mb-1">
-                  <span class="font-medium">{{ user.name || user.email }}</span>
-                  <Badge :class="getRoleColor(user.role)">
+                <div class="flex items-center gap-2 mb-1 flex-wrap">
+                  <span class="font-medium text-sm">{{ user.name || user.email }}</span>
+                  <Badge :class="[getRoleColor(user.role), 'text-xs font-medium']">
                     {{ getRoleLabel(user.role) }}
                   </Badge>
-                  <Badge v-if="isCurrentUser(user)" variant="outline" class="text-primary border-primary">
-                    T&uacute;
+                  <Badge v-if="isCurrentUser(user)" class="bg-primary/15 text-primary text-xs font-medium">
+                    Tú
+                  </Badge>
+                  <Badge v-if="user.is_active === false" class="bg-gray-500/15 text-gray-500 text-xs">
+                    Inactivo
                   </Badge>
                 </div>
-                <div class="flex items-center gap-4 text-sm text-muted-foreground">
+                <div class="flex items-center gap-3 text-xs text-muted-foreground">
                   <span>{{ user.email }}</span>
                   <span>Desde {{ formatDate(user.created_at) }}</span>
                 </div>
@@ -357,28 +388,41 @@ useHead({
 
               <!-- Actions -->
               <div v-if="!isCurrentUser(user)" class="flex items-center gap-1 shrink-0">
-                <Button variant="ghost" size="icon" title="Editar" @click="openEditDialog(user)">
+                <Button
+                  v-if="user.is_active === false"
+                  variant="ghost"
+                  size="icon"
+                  class="rounded-xl h-9 w-9 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-500/10"
+                  title="Reactivar"
+                  @click="handleReactivate(user)"
+                >
+                  <RotateCcw class="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="icon" class="rounded-xl h-9 w-9" title="Editar" @click="openEditDialog(user)">
                   <Edit class="h-4 w-4" />
                 </Button>
                 <Button
+                  v-if="user.is_active !== false"
                   variant="ghost"
                   size="icon"
+                  class="rounded-xl h-9 w-9 text-amber-500 hover:text-amber-600 hover:bg-amber-500/10"
                   title="Desactivar"
                   @click="confirmDeactivate(user)"
                 >
-                  <Trash2 class="h-4 w-4 text-orange-500" />
+                  <Trash2 class="h-4 w-4" />
                 </Button>
                 <Button
                   variant="ghost"
                   size="icon"
+                  class="rounded-xl h-9 w-9 text-destructive hover:text-destructive hover:bg-destructive/10"
                   title="Eliminar permanentemente"
                   @click="confirmDelete(user)"
                 >
-                  <AlertTriangle class="h-4 w-4 text-destructive" />
+                  <AlertTriangle class="h-4 w-4" />
                 </Button>
               </div>
               <div v-else class="shrink-0">
-                <Badge variant="outline" class="text-xs text-muted-foreground">Cuenta actual</Badge>
+                <Badge class="bg-primary/10 text-primary text-xs">Cuenta actual</Badge>
               </div>
             </div>
           </div>
@@ -388,219 +432,244 @@ useHead({
 
     <!-- Create User Dialog -->
     <Teleport to="body">
-      <div
-        v-if="showCreateDialog"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-        @click.self="showCreateDialog = false"
-      >
-        <Card class="w-full max-w-md mx-4">
-          <CardHeader>
-            <div class="flex items-center justify-between">
-              <CardTitle>Crear Usuario</CardTitle>
-              <Button variant="ghost" size="icon" @click="showCreateDialog = false">
-                <X class="h-4 w-4" />
-              </Button>
-            </div>
-          </CardHeader>
-          <form @submit.prevent="handleCreate">
-            <CardContent class="space-y-4">
-              <!-- Error message inside modal -->
-              <div v-if="errorMessage" class="bg-destructive/10 text-destructive text-sm p-3 rounded-md">
-                {{ errorMessage }}
-              </div>
-
-              <!-- Email -->
-              <div class="space-y-2">
-                <Label for="create-email">Email *</Label>
-                <Input
-                  id="create-email"
-                  v-model="createForm.email"
-                  type="email"
-                  placeholder="usuario@ejemplo.com"
-                  required
-                />
-              </div>
-
-              <!-- Password -->
-              <div class="space-y-2">
-                <Label for="create-password">Contrase&ntilde;a *</Label>
-                <div class="relative">
-                  <Input
-                    id="create-password"
-                    v-model="createForm.password"
-                    :type="showPassword ? 'text' : 'password'"
-                    placeholder="M&iacute;nimo 6 caracteres"
-                    minlength="6"
-                    required
-                    class="pr-10"
-                  />
-                  <button
-                    type="button"
-                    class="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                    @click="showPassword = !showPassword"
-                  >
-                    <EyeOff v-if="showPassword" class="h-4 w-4" />
-                    <Eye v-else class="h-4 w-4" />
-                  </button>
+      <Transition name="fade">
+        <div
+          v-if="showCreateDialog"
+          class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+          @click.self="showCreateDialog = false"
+        >
+          <Card class="w-full max-w-md mx-4 shadow-2xl">
+            <CardHeader>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-blue-400/20 flex items-center justify-center">
+                    <UserPlus class="h-5 w-5 text-primary" />
+                  </div>
+                  <CardTitle>Crear Usuario</CardTitle>
                 </div>
+                <Button variant="ghost" size="icon" class="rounded-xl" @click="showCreateDialog = false">
+                  <X class="h-4 w-4" />
+                </Button>
               </div>
+            </CardHeader>
+            <form @submit.prevent="handleCreate">
+              <CardContent class="space-y-4">
+                <!-- Error message inside modal -->
+                <div v-if="errorMessage" class="bg-destructive/10 text-destructive text-sm p-3 rounded-xl flex items-center gap-2">
+                  <AlertTriangle class="h-4 w-4 shrink-0" />
+                  {{ errorMessage }}
+                </div>
 
-              <!-- Role -->
-              <div class="space-y-2">
-                <Label>Rol *</Label>
-                <Select v-model="createForm.role">
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="admin">Administrador</SelectItem>
-                    <SelectItem value="editor">Editor</SelectItem>
-                    <SelectItem value="viewer">Visor</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-            <CardFooter class="flex justify-end gap-2">
-              <Button type="button" variant="outline" @click="showCreateDialog = false">
-                Cancelar
-              </Button>
-              <Button type="submit" :disabled="saving">
-                <Loader2 v-if="saving" class="h-4 w-4 mr-2 animate-spin" />
-                Crear
-              </Button>
-            </CardFooter>
-          </form>
-        </Card>
-      </div>
+                <!-- Email -->
+                <div class="space-y-2">
+                  <Label for="create-email">Email *</Label>
+                  <Input
+                    id="create-email"
+                    v-model="createForm.email"
+                    type="email"
+                    placeholder="usuario@ejemplo.com"
+                    class="rounded-xl"
+                    required
+                  />
+                </div>
+
+                <!-- Password -->
+                <div class="space-y-2">
+                  <Label for="create-password">Contraseña *</Label>
+                  <div class="relative">
+                    <Input
+                      id="create-password"
+                      v-model="createForm.password"
+                      :type="showPassword ? 'text' : 'password'"
+                      placeholder="Mínimo 6 caracteres"
+                      minlength="6"
+                      required
+                      class="pr-10 rounded-xl"
+                    />
+                    <button
+                      type="button"
+                      class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      @click="showPassword = !showPassword"
+                    >
+                      <EyeOff v-if="showPassword" class="h-4 w-4" />
+                      <Eye v-else class="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Role -->
+                <div class="space-y-2">
+                  <Label>Rol *</Label>
+                  <Select v-model="createForm.role">
+                    <SelectTrigger class="rounded-xl">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="admin">Administrador</SelectItem>
+                      <SelectItem value="editor">Editor</SelectItem>
+                      <SelectItem value="viewer">Visor</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CardContent>
+              <CardFooter class="flex justify-end gap-2">
+                <Button type="button" variant="outline" class="rounded-xl" @click="showCreateDialog = false">
+                  Cancelar
+                </Button>
+                <Button type="submit" class="rounded-xl" :disabled="saving">
+                  <Loader2 v-if="saving" class="h-4 w-4 mr-2 animate-spin" />
+                  Crear
+                </Button>
+              </CardFooter>
+            </form>
+          </Card>
+        </div>
+      </Transition>
     </Teleport>
 
     <!-- Edit Dialog -->
     <Teleport to="body">
-      <div
-        v-if="showEditDialog"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-        @click.self="showEditDialog = false"
-      >
-        <Card class="w-full max-w-md mx-4">
-          <CardHeader>
-            <div class="flex items-center justify-between">
-              <CardTitle>Editar Usuario</CardTitle>
-              <Button variant="ghost" size="icon" @click="showEditDialog = false">
-                <X class="h-4 w-4" />
-              </Button>
-            </div>
-          </CardHeader>
-          <form @submit.prevent="handleEdit">
-            <CardContent class="space-y-4">
-              <!-- Email (readonly) -->
-              <div class="space-y-2">
-                <Label for="edit-email">Email</Label>
-                <Input
-                  id="edit-email"
-                  v-model="editForm.email"
-                  disabled
-                  class="bg-muted"
-                />
+      <Transition name="fade">
+        <div
+          v-if="showEditDialog"
+          class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+          @click.self="showEditDialog = false"
+        >
+          <Card class="w-full max-w-md mx-4 shadow-2xl">
+            <CardHeader>
+              <div class="flex items-center justify-between">
+                <CardTitle>Editar Usuario</CardTitle>
+                <Button variant="ghost" size="icon" class="rounded-xl" @click="showEditDialog = false">
+                  <X class="h-4 w-4" />
+                </Button>
               </div>
+            </CardHeader>
+            <form @submit.prevent="handleEdit">
+              <CardContent class="space-y-4">
+                <!-- Email (readonly) -->
+                <div class="space-y-2">
+                  <Label for="edit-email">Email</Label>
+                  <Input
+                    id="edit-email"
+                    v-model="editForm.email"
+                    disabled
+                    class="bg-muted/50 rounded-xl"
+                  />
+                </div>
 
-              <!-- Full Name -->
-              <div class="space-y-2">
-                <Label for="edit-name">Nombre</Label>
-                <Input
-                  id="edit-name"
-                  v-model="editForm.full_name"
-                  placeholder="Nombre del usuario"
-                />
-              </div>
+                <!-- Full Name -->
+                <div class="space-y-2">
+                  <Label for="edit-name">Nombre</Label>
+                  <Input
+                    id="edit-name"
+                    v-model="editForm.full_name"
+                    placeholder="Nombre del usuario"
+                    class="rounded-xl"
+                  />
+                </div>
 
-              <!-- Role -->
-              <div class="space-y-2">
-                <Label>Rol</Label>
-                <Select v-model="editForm.role">
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="admin">Administrador</SelectItem>
-                    <SelectItem value="editor">Editor</SelectItem>
-                    <SelectItem value="viewer">Visor</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-            <CardFooter class="flex justify-end gap-2">
-              <Button type="button" variant="outline" @click="showEditDialog = false">
-                Cancelar
-              </Button>
-              <Button type="submit" :disabled="saving">
-                <Loader2 v-if="saving" class="h-4 w-4 mr-2 animate-spin" />
-                Guardar
-              </Button>
-            </CardFooter>
-          </form>
-        </Card>
-      </div>
+                <!-- Role -->
+                <div class="space-y-2">
+                  <Label>Rol</Label>
+                  <Select v-model="editForm.role">
+                    <SelectTrigger class="rounded-xl">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="admin">Administrador</SelectItem>
+                      <SelectItem value="editor">Editor</SelectItem>
+                      <SelectItem value="viewer">Visor</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CardContent>
+              <CardFooter class="flex justify-end gap-2">
+                <Button type="button" variant="outline" class="rounded-xl" @click="showEditDialog = false">
+                  Cancelar
+                </Button>
+                <Button type="submit" class="rounded-xl" :disabled="saving">
+                  <Loader2 v-if="saving" class="h-4 w-4 mr-2 animate-spin" />
+                  Guardar
+                </Button>
+              </CardFooter>
+            </form>
+          </Card>
+        </div>
+      </Transition>
     </Teleport>
 
     <!-- Deactivate Confirmation Dialog -->
     <Teleport to="body">
-      <div
-        v-if="showDeactivateDialog"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-        @click.self="showDeactivateDialog = false"
-      >
-        <Card class="w-full max-w-md mx-4">
-          <CardHeader>
-            <CardTitle>Desactivar Usuario</CardTitle>
-            <CardDescription>
-              &iquest;Desactivar a "{{ userToDeactivate?.name || userToDeactivate?.email }}"? El usuario no podr&aacute; acceder al panel pero sus datos se conservar&aacute;n.
-            </CardDescription>
-          </CardHeader>
-          <CardFooter class="flex justify-end gap-2">
-            <Button variant="outline" @click="showDeactivateDialog = false">
-              Cancelar
-            </Button>
-            <Button variant="destructive" @click="handleDeactivate">
-              Desactivar
-            </Button>
-          </CardFooter>
-        </Card>
-      </div>
+      <Transition name="fade">
+        <div
+          v-if="showDeactivateDialog"
+          class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+          @click.self="showDeactivateDialog = false"
+        >
+          <Card class="w-full max-w-md mx-4 shadow-2xl">
+            <CardHeader>
+              <CardTitle>Desactivar Usuario</CardTitle>
+              <CardDescription>
+                ¿Desactivar a "{{ userToDeactivate?.name || userToDeactivate?.email }}"? El usuario no podrá acceder al panel pero sus datos se conservarán.
+              </CardDescription>
+            </CardHeader>
+            <CardFooter class="flex justify-end gap-2">
+              <Button variant="outline" class="rounded-xl" @click="showDeactivateDialog = false">
+                Cancelar
+              </Button>
+              <Button variant="destructive" class="rounded-xl" @click="handleDeactivate">
+                Desactivar
+              </Button>
+            </CardFooter>
+          </Card>
+        </div>
+      </Transition>
     </Teleport>
 
     <!-- Delete Permanently Confirmation Dialog -->
     <Teleport to="body">
-      <div
-        v-if="showDeleteDialog"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-        @click.self="showDeleteDialog = false"
-      >
-        <Card class="w-full max-w-md mx-4">
-          <CardHeader>
-            <div class="flex items-center gap-2 text-destructive mb-2">
-              <AlertTriangle class="h-5 w-5" />
-              <CardTitle class="text-destructive">Eliminar Permanentemente</CardTitle>
-            </div>
-            <CardDescription>
-              Esta acci&oacute;n es <strong>irreversible</strong>. Se eliminar&aacute; a "{{ userToDelete?.name || userToDelete?.email }}" del sistema y de la autenticaci&oacute;n. No podr&aacute; recuperarse.
-            </CardDescription>
-          </CardHeader>
-          <CardFooter class="flex justify-end gap-2">
-            <Button variant="outline" @click="showDeleteDialog = false">
-              Cancelar
-            </Button>
-            <Button variant="destructive" :disabled="saving" @click="handleDelete">
-              <Loader2 v-if="saving" class="h-4 w-4 mr-2 animate-spin" />
-              Eliminar permanentemente
-            </Button>
-          </CardFooter>
-        </Card>
-      </div>
+      <Transition name="fade">
+        <div
+          v-if="showDeleteDialog"
+          class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+          @click.self="showDeleteDialog = false"
+        >
+          <Card class="w-full max-w-md mx-4 shadow-2xl">
+            <CardHeader>
+              <div class="flex items-center gap-2 text-destructive mb-2">
+                <AlertTriangle class="h-5 w-5" />
+                <CardTitle class="text-destructive">Eliminar Permanentemente</CardTitle>
+              </div>
+              <CardDescription>
+                Esta acción es <strong>irreversible</strong>. Se eliminará a "{{ userToDelete?.name || userToDelete?.email }}" del sistema y de la autenticación. No podrá recuperarse.
+              </CardDescription>
+            </CardHeader>
+            <CardFooter class="flex justify-end gap-2">
+              <Button variant="outline" class="rounded-xl" @click="showDeleteDialog = false">
+                Cancelar
+              </Button>
+              <Button variant="destructive" class="rounded-xl" :disabled="saving" @click="handleDelete">
+                <Loader2 v-if="saving" class="h-4 w-4 mr-2 animate-spin" />
+                Eliminar permanentemente
+              </Button>
+            </CardFooter>
+          </Card>
+        </div>
+      </Transition>
     </Teleport>
   </div>
 </template>
 
 <style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
 .slide-down-enter-active,
 .slide-down-leave-active {
   transition: all 0.3s ease;
