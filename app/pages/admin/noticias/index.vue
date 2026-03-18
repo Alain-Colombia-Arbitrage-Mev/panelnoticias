@@ -15,6 +15,7 @@ const searchQuery = ref('')
 const selectedStatus = ref('')
 const selectedCategory = ref('')
 const selectedSourceType = ref('')
+const selectedSort = ref('created_at')
 const showDeleteDialog = ref(false)
 const articleToDelete = ref<Noticia | null>(null)
 
@@ -29,12 +30,14 @@ const loadArticles = async () => {
   const data = await fetchArticles({
     status: selectedStatus.value || undefined,
     category_id: selectedCategory.value || undefined,
-    limit: 50,
+    orderBy: selectedSort.value,
+    orderDirection: 'desc',
+    limit: 100,
   })
   articles.value = data || []
 }
 
-watch([selectedStatus, selectedCategory], () => {
+watch([selectedStatus, selectedCategory, selectedSort], () => {
   loadArticles()
 })
 
@@ -165,6 +168,16 @@ useHead({
             <option v-for="cat in categories" :key="cat.id" :value="cat.id">
               {{ cat.name }}
             </option>
+          </select>
+
+          <!-- Sort -->
+          <select
+            v-model="selectedSort"
+            class="h-9 w-full sm:w-[180px] rounded-lg border border-input bg-background px-3 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+          >
+            <option value="created_at">Más recientes</option>
+            <option value="views">Más vistas</option>
+            <option value="published_at">Fecha publicación</option>
           </select>
         </div>
       </CardContent>
