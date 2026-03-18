@@ -32,7 +32,7 @@ onMounted(async () => {
     }
 
     // Verificar que la categoría coincida
-    if (articleData.category?.slug !== categoria.value) {
+    if (articleData.categoria?.slug !== categoria.value) {
       error.value = 'La categoría no coincide'
       return
     }
@@ -50,7 +50,7 @@ onMounted(async () => {
 
     // Configurar meta tags
     useHead({
-      title: `${articleData.title} - ${articleData.category?.name || 'Noticias'}`,
+      title: `${articleData.title} - ${articleData.categoria?.name || 'Noticias'}`,
       meta: [
         {
           name: 'description',
@@ -119,19 +119,19 @@ const formatDate = (date: string) => {
         <!-- Category Badge -->
         <div class="mb-4">
           <NuxtLink
-            :to="`/${article.category?.slug || ''}`"
+            :to="`/${article.categoria?.slug || ''}`"
             class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
             :style="{ 
-              backgroundColor: `${article.category?.color || '#3B82F6'}20`,
-              color: article.category?.color || '#3B82F6'
+              backgroundColor: `${article.categoria?.color || '#3B82F6'}20`,
+              color: article.categoria?.color || '#3B82F6'
             }"
           >
-            {{ article.category?.name || 'Sin categoría' }}
+            {{ article.categoria?.name || 'Sin categoría' }}
           </NuxtLink>
         </div>
 
         <!-- Title -->
-        <h1 class="font-display text-4xl md:text-5xl font-bold mb-4 leading-tight">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4 leading-tight">
           {{ article.title }}
         </h1>
 
