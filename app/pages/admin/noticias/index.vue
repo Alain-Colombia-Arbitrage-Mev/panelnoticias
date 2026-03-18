@@ -26,10 +26,13 @@ onMounted(async () => {
   ])
 })
 
+let searchTimeout: ReturnType<typeof setTimeout> | null = null
+
 const loadArticles = async () => {
   const data = await fetchArticles({
     status: selectedStatus.value || undefined,
     category_id: selectedCategory.value || undefined,
+    search: searchQuery.value || undefined,
     orderBy: selectedSort.value,
     orderDirection: 'desc',
     limit: 100,
@@ -41,16 +44,15 @@ watch([selectedStatus, selectedCategory, selectedSort], () => {
   loadArticles()
 })
 
+watch(searchQuery, () => {
+  if (searchTimeout) clearTimeout(searchTimeout)
+  searchTimeout = setTimeout(() => {
+    loadArticles()
+  }, 400)
+})
+
 const filteredArticles = computed(() => {
   let result = articles.value
-
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase()
-    result = result.filter(article =>
-      article.title.toLowerCase().includes(query) ||
-      article.excerpt?.toLowerCase().includes(query)
-    )
-  }
 
   if (selectedSourceType.value !== '') {
     const sourceType = parseInt(selectedSourceType.value)

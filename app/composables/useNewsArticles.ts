@@ -10,6 +10,7 @@ export const useNewsArticles = () => {
   const fetchArticles = async (options?: {
     status?: string
     category_id?: string
+    search?: string
     limit?: number
     offset?: number
     orderBy?: string
@@ -33,6 +34,10 @@ export const useNewsArticles = () => {
 
       if (options?.category_id) {
         query = query.eq('category_id', options.category_id)
+      }
+
+      if (options?.search) {
+        query = query.ilike('title', `%${options.search}%`)
       }
 
       const orderBy = options?.orderBy || 'created_at'
