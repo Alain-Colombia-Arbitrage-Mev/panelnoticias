@@ -11,7 +11,9 @@ import {
   Sun,
   Moon,
   Newspaper,
-  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Bell,
 } from 'lucide-vue-next'
 
 const colorMode = useColorMode()
@@ -32,9 +34,9 @@ const toggleDark = () => {
 const navigation = computed(() => [
   { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
   { name: 'Noticias', href: '/admin/noticias', icon: FileText },
-  { name: 'Categorías', href: '/admin/categorias', icon: FolderOpen },
+  { name: 'Categorias', href: '/admin/categorias', icon: FolderOpen },
   ...(isAdmin.value ? [{ name: 'Usuarios', href: '/admin/usuarios', icon: Users }] : []),
-  { name: 'Configuración', href: '/admin/configuracion', icon: Settings },
+  { name: 'Config', href: '/admin/configuracion', icon: Settings },
 ])
 
 const isActive = (href: string) => {
@@ -46,123 +48,160 @@ const isActive = (href: string) => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-background">
+  <div class="min-h-screen bg-background gradient-mesh">
     <!-- Mobile Sidebar Overlay -->
-    <div
-      v-if="isMobileSidebarOpen"
-      class="fixed inset-0 z-40 bg-black/50 lg:hidden"
-      @click="isMobileSidebarOpen = false"
-    />
+    <Transition name="fade">
+      <div
+        v-if="isMobileSidebarOpen"
+        class="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden"
+        @click="isMobileSidebarOpen = false"
+      />
+    </Transition>
 
     <!-- Sidebar -->
     <aside
       :class="[
-        'fixed inset-y-0 left-0 z-50 flex flex-col bg-card border-r transition-all duration-300',
-        isSidebarOpen ? 'w-64' : 'w-20',
+        'fixed inset-y-0 left-0 z-50 flex flex-col glass-strong transition-all duration-300 rounded-r-2xl',
+        isSidebarOpen ? 'w-64' : 'w-[72px]',
         isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
       ]"
     >
       <!-- Logo -->
-      <div class="flex items-center justify-between h-16 px-4 border-b">
-        <NuxtLink to="/admin" class="flex items-center gap-2">
-          <Newspaper class="h-8 w-8 text-primary shrink-0" />
-          <span v-if="isSidebarOpen" class="font-display text-lg font-bold">Admin</span>
+      <div class="flex items-center h-16 px-4" :class="isSidebarOpen ? 'justify-between' : 'justify-center'">
+        <NuxtLink to="/admin" class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-blue-400 flex items-center justify-center shadow-lg shadow-primary/20">
+            <Newspaper class="h-5 w-5 text-white" />
+          </div>
+          <Transition name="fade">
+            <span v-if="isSidebarOpen" class="font-display text-lg font-bold bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent">
+              Panel
+            </span>
+          </Transition>
         </NuxtLink>
-        <Button
-          v-if="isSidebarOpen"
-          variant="ghost"
-          size="icon"
-          class="hidden lg:flex"
-          @click="isSidebarOpen = false"
-        >
-          <ChevronDown class="h-4 w-4 rotate-90" />
-        </Button>
       </div>
 
       <!-- Navigation -->
-      <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+      <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto scrollbar-hide">
         <NuxtLink
           v-for="item in navigation"
           :key="item.name"
           :to="item.href"
           :class="[
-            'flex items-center gap-3 px-3 py-2 rounded-lg transition-colors',
+            'flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative',
             isActive(item.href)
-              ? 'bg-primary text-primary-foreground'
-              : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
+              ? 'bg-gradient-to-r from-primary to-blue-400 text-white shadow-lg shadow-primary/25'
+              : 'text-muted-foreground hover:bg-white/50 dark:hover:bg-white/5 hover:text-foreground',
+            !isSidebarOpen && 'justify-center px-0',
           ]"
           @click="isMobileSidebarOpen = false"
         >
           <component :is="item.icon" class="h-5 w-5 shrink-0" />
-          <span v-if="isSidebarOpen">{{ item.name }}</span>
+          <span v-if="isSidebarOpen" class="text-sm font-medium">{{ item.name }}</span>
+          <!-- Tooltip when collapsed -->
+          <div
+            v-if="!isSidebarOpen"
+            class="absolute left-full ml-2 px-2 py-1 rounded-md bg-foreground text-background text-xs font-medium opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50"
+          >
+            {{ item.name }}
+          </div>
         </NuxtLink>
       </nav>
 
+      <!-- Collapse Toggle -->
+      <div class="px-3 py-2 hidden lg:block">
+        <button
+          class="w-full flex items-center justify-center p-2 rounded-xl text-muted-foreground hover:bg-white/50 dark:hover:bg-white/5 hover:text-foreground transition-colors"
+          @click="isSidebarOpen = !isSidebarOpen"
+        >
+          <ChevronLeft v-if="isSidebarOpen" class="h-4 w-4" />
+          <ChevronRight v-else class="h-4 w-4" />
+        </button>
+      </div>
+
       <!-- User Section -->
-      <div class="p-4 border-t">
-        <div v-if="portalUser" :class="['flex items-center gap-3', !isSidebarOpen && 'justify-center']">
-          <Avatar class="h-10 w-10">
-            <AvatarImage :src="portalUser.avatar_url || ''" />
-            <AvatarFallback>{{ portalUser.name?.charAt(0)?.toUpperCase() || 'U' }}</AvatarFallback>
-          </Avatar>
+      <div class="p-3 border-t border-white/10">
+        <div v-if="portalUser" :class="['flex items-center gap-3 p-2 rounded-xl', !isSidebarOpen && 'justify-center']">
+          <div class="relative">
+            <Avatar class="h-9 w-9 ring-2 ring-primary/20">
+              <AvatarImage :src="portalUser.avatar_url || ''" />
+              <AvatarFallback class="bg-gradient-to-br from-primary to-blue-400 text-white text-sm font-bold">
+                {{ portalUser.name?.charAt(0)?.toUpperCase() || 'U' }}
+              </AvatarFallback>
+            </Avatar>
+            <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-green-400 border-2 border-background"></div>
+          </div>
           <div v-if="isSidebarOpen" class="flex-1 min-w-0">
-            <p class="text-sm font-medium truncate">{{ portalUser.name || portalUser.email }}</p>
-            <p class="text-xs text-muted-foreground truncate">{{ portalUser.email }}</p>
+            <p class="text-sm font-semibold truncate">{{ portalUser.name || portalUser.email }}</p>
+            <p class="text-xs text-muted-foreground truncate">{{ portalUser.role }}</p>
           </div>
         </div>
 
-        <Button
-          variant="ghost"
-          :class="['w-full mt-3 text-destructive hover:text-destructive', !isSidebarOpen && 'px-0']"
+        <button
+          :class="[
+            'w-full mt-2 flex items-center gap-2 p-2 rounded-xl text-sm text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all duration-200',
+            !isSidebarOpen && 'justify-center',
+          ]"
           @click="signOut"
         >
           <LogOut class="h-4 w-4" />
-          <span v-if="isSidebarOpen" class="ml-2">Cerrar Sesión</span>
-        </Button>
+          <span v-if="isSidebarOpen">Salir</span>
+        </button>
       </div>
     </aside>
 
     <!-- Main Content -->
-    <div :class="['min-h-screen transition-all duration-300', isSidebarOpen ? 'lg:ml-64' : 'lg:ml-20']">
+    <div :class="['min-h-screen transition-all duration-300', isSidebarOpen ? 'lg:ml-64' : 'lg:ml-[72px]']">
       <!-- Top Bar -->
-      <header class="sticky top-0 z-40 flex items-center justify-between h-16 px-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div class="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            class="lg:hidden"
-            @click="isMobileSidebarOpen = true"
-          >
-            <Menu class="h-5 w-5" />
-          </Button>
+      <header class="sticky top-0 z-40 mx-4 mt-4 mb-2 rounded-2xl">
+        <div class="flex items-center justify-between h-14 px-4 glass rounded-2xl">
+          <div class="flex items-center gap-3">
+            <button
+              class="lg:hidden p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/5 transition-colors text-muted-foreground"
+              @click="isMobileSidebarOpen = true"
+            >
+              <Menu class="h-5 w-5" />
+            </button>
 
-          <Button
-            variant="ghost"
-            size="icon"
-            class="hidden lg:flex"
-            @click="isSidebarOpen = !isSidebarOpen"
-          >
-            <Menu class="h-5 w-5" />
-          </Button>
+            <div>
+              <h1 class="text-sm font-bold">
+                {{ navigation.find(item => isActive(item.href))?.name || 'Admin' }}
+              </h1>
+            </div>
+          </div>
 
-          <h1 class="text-lg font-semibold">
-            {{ navigation.find(item => isActive(item.href))?.name || 'Admin' }}
-          </h1>
-        </div>
-
-        <div class="flex items-center gap-2">
-          <Button variant="ghost" size="icon" @click="toggleDark">
-            <Sun v-if="colorMode.value === 'dark'" class="h-5 w-5" />
-            <Moon v-else class="h-5 w-5" />
-          </Button>
+          <div class="flex items-center gap-1">
+            <button
+              class="relative p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/5 transition-colors text-muted-foreground"
+            >
+              <Bell class="h-4 w-4" />
+              <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-primary"></span>
+            </button>
+            <button
+              class="p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/5 transition-colors text-muted-foreground"
+              @click="toggleDark"
+            >
+              <Sun v-if="colorMode.value === 'dark'" class="h-4 w-4" />
+              <Moon v-else class="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </header>
 
       <!-- Page Content -->
-      <main class="p-6">
+      <main class="px-4 pb-6 lg:px-6">
         <slot />
       </main>
     </div>
   </div>
 </template>
 
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>
