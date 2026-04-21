@@ -73,6 +73,11 @@ const fetchUsers = async () => {
   }
 }
 
+const getAuthToken = async () => {
+  const { data: sessionData } = await supabase.auth.getSession()
+  return sessionData.session?.access_token ?? null
+}
+
 // --- Create User ---
 const openCreateDialog = () => {
   createForm.value = { email: '', password: '', role: 'editor' }
@@ -135,22 +140,28 @@ const handleEdit = async () => {
   saving.value = true
 
   try {
-    const { error } = await supabase
-      .from('usuarios')
-      .update({
+    const token = await getAuthToken()
+    if (!token) {
+      showNotification('error', 'Sesión expirada. Vuelve a iniciar sesión.')
+      return
+    }
+
+    await $fetch(`/api/admin/users/${editingUser.value.id}`, {
+      method: 'PATCH',
+      headers: { Authorization: `Bearer ${token}` },
+      body: {
         name: editForm.value.full_name || editForm.value.username,
         role: editForm.value.role,
-      })
-      .eq('id', editingUser.value.id)
-
-    if (error) throw error
+      },
+    })
 
     await fetchUsers()
     showEditDialog.value = false
     showNotification('success', 'Usuario actualizado')
-  } catch (error) {
-    console.error('Error updating user:', error)
-    showNotification('error', 'Error al actualizar el usuario')
+  } catch (err: any) {
+    console.error('Error updating user:', err)
+    const message = err.data?.message || err.message || 'Error al actualizar el usuario'
+    showNotification('error', message)
   } finally {
     saving.value = false
   }
@@ -166,38 +177,50 @@ const handleDeactivate = async () => {
   if (!userToDeactivate.value) return
 
   try {
-    const { error } = await supabase
-      .from('usuarios')
-      .update({ is_active: false })
-      .eq('id', userToDeactivate.value.id)
+    const token = await getAuthToken()
+    if (!token) {
+      showNotification('error', 'Sesión expirada. Vuelve a iniciar sesión.')
+      return
+    }
 
-    if (error) throw error
+    await $fetch(`/api/admin/users/${userToDeactivate.value.id}`, {
+      method: 'PATCH',
+      headers: { Authorization: `Bearer ${token}` },
+      body: { is_active: false },
+    })
 
     await fetchUsers()
     showDeactivateDialog.value = false
     showNotification('success', 'Usuario desactivado')
     userToDeactivate.value = null
-  } catch (error) {
-    console.error('Error deactivating user:', error)
-    showNotification('error', 'Error al desactivar el usuario')
+  } catch (err: any) {
+    console.error('Error deactivating user:', err)
+    const message = err.data?.message || err.message || 'Error al desactivar el usuario'
+    showNotification('error', message)
   }
 }
 
 // --- Reactivate User ---
 const handleReactivate = async (user: NewsPortalUser) => {
   try {
-    const { error } = await supabase
-      .from('usuarios')
-      .update({ is_active: true })
-      .eq('id', user.id)
+    const token = await getAuthToken()
+    if (!token) {
+      showNotification('error', 'Sesión expirada. Vuelve a iniciar sesión.')
+      return
+    }
 
-    if (error) throw error
+    await $fetch(`/api/admin/users/${user.id}`, {
+      method: 'PATCH',
+      headers: { Authorization: `Bearer ${token}` },
+      body: { is_active: true },
+    })
 
     await fetchUsers()
     showNotification('success', 'Usuario reactivado')
-  } catch (error) {
-    console.error('Error reactivating user:', error)
-    showNotification('error', 'Error al reactivar el usuario')
+  } catch (err: any) {
+    console.error('Error reactivating user:', err)
+    const message = err.data?.message || err.message || 'Error al reactivar el usuario'
+    showNotification('error', message)
   }
 }
 

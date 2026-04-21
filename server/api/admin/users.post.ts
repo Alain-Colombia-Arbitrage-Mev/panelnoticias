@@ -92,6 +92,7 @@ export default defineEventHandler(async (event) => {
         name: username,
         role,
         avatar_url: null,
+        is_active: true,
       })
       .select()
       .single()
