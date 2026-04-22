@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import { validatePasswordStrength, isPasswordPwned } from '../../utils/password'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
@@ -53,8 +54,16 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, message: 'Formato de email inválido' })
   }
 
-  if (password.length < 6) {
-    throw createError({ statusCode: 400, message: 'La contraseña debe tener al menos 6 caracteres' })
+  const strength = validatePasswordStrength(password)
+  if (!strength.ok) {
+    throw createError({ statusCode: 400, message: strength.message })
+  }
+
+  if (await isPasswordPwned(password)) {
+    throw createError({
+      statusCode: 400,
+      message: 'Esta contraseña apareció en filtraciones públicas. Usa otra.',
+    })
   }
 
   const validRoles = ['admin', 'editor', 'viewer']

@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import { validatePasswordStrength, isPasswordPwned } from '../../../utils/password'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
@@ -42,7 +43,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const body = await readBody(event)
-  const { name, role, is_active } = body ?? {}
+  const { name, role, is_active, password } = body ?? {}
 
   const updates: Record<string, unknown> = {}
 
@@ -72,7 +73,22 @@ export default defineEventHandler(async (event) => {
     updates.is_active = is_active
   }
 
-  if (Object.keys(updates).length === 0) {
+  let passwordToApply: string | undefined
+  if (typeof password !== 'undefined' && password !== null && password !== '') {
+    const strength = validatePasswordStrength(password)
+    if (!strength.ok) {
+      throw createError({ statusCode: 400, message: strength.message })
+    }
+    if (await isPasswordPwned(password)) {
+      throw createError({
+        statusCode: 400,
+        message: 'Esta contraseña apareció en filtraciones públicas. Usa otra.',
+      })
+    }
+    passwordToApply = password
+  }
+
+  if (Object.keys(updates).length === 0 && !passwordToApply) {
     throw createError({ statusCode: 400, message: 'No hay cambios para aplicar' })
   }
 
@@ -81,22 +97,54 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    const { data: updated, error: updateError } = await supabaseAdmin
-      .from('usuarios')
-      .update(updates)
-      .eq('id', userId)
-      .select()
-      .single()
+    let updatedRow: any = null
 
-    if (updateError) throw updateError
+    if (Object.keys(updates).length > 0) {
+      const { data, error: updateError } = await supabaseAdmin
+        .from('usuarios')
+        .update(updates)
+        .eq('id', userId)
+        .select()
+        .single()
 
-    if (!updated) {
-      throw createError({ statusCode: 404, message: 'Usuario no encontrado' })
+      if (updateError) throw updateError
+      if (!data) {
+        throw createError({ statusCode: 404, message: 'Usuario no encontrado' })
+      }
+      updatedRow = data
+    } else {
+      const { data, error: fetchError } = await supabaseAdmin
+        .from('usuarios')
+        .select('*')
+        .eq('id', userId)
+        .single()
+
+      if (fetchError || !data) {
+        throw createError({ statusCode: 404, message: 'Usuario no encontrado' })
+      }
+      updatedRow = data
     }
 
-    console.info(`[ADMIN] User updated: ${updated.email} by admin ${authUser.email}`)
+    if (passwordToApply) {
+      const { data: { users: authUsers }, error: listError } = await supabaseAdmin.auth.admin.listUsers()
+      if (listError) throw listError
 
-    return { success: true, user: updated }
+      const authTarget = authUsers?.find(u => u.email === updatedRow.email)
+      if (!authTarget) {
+        throw createError({ statusCode: 404, message: 'Usuario no encontrado en autenticación' })
+      }
+
+      const { error: pwError } = await supabaseAdmin.auth.admin.updateUserById(authTarget.id, {
+        password: passwordToApply,
+      })
+      if (pwError) throw pwError
+
+      console.info(`[ADMIN] Password reset for ${updatedRow.email} by admin ${authUser.email}`)
+    }
+
+    console.info(`[ADMIN] User updated: ${updatedRow.email} by admin ${authUser.email}`)
+
+    return { success: true, user: updatedRow }
   } catch (err: any) {
     if (err.statusCode) throw err
 

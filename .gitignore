@@ -44,6 +44,14 @@ Thumbs.db
 *.swo
 *~
 
+# macOS AppleDouble metadata (rompe el build si entra en server/app)
+._*
+
+# Supabase / Wrangler / Playwright artefactos locales
+supabase/.temp
+.wrangler
+.playwright-mcp
+
 # IDEs
 .vscode/
 .idea/

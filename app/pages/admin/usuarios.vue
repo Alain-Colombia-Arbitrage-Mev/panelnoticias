@@ -28,7 +28,11 @@ const editForm = ref({
   username: '',
   full_name: '',
   role: 'editor' as 'admin' | 'editor' | 'viewer',
+  password: '',
 })
+
+const showEditPassword = ref(false)
+const sendingReset = ref(false)
 
 const createForm = ref({
   email: '',
@@ -130,7 +134,9 @@ const openEditDialog = (user: NewsPortalUser) => {
     username: user.name || '',
     full_name: user.name || '',
     role: user.role as 'admin' | 'editor' | 'viewer',
+    password: '',
   }
+  showEditPassword.value = false
   showEditDialog.value = true
 }
 
@@ -146,24 +152,59 @@ const handleEdit = async () => {
       return
     }
 
+    const body: Record<string, unknown> = {
+      name: editForm.value.full_name || editForm.value.username,
+      role: editForm.value.role,
+    }
+    if (editForm.value.password.trim().length > 0) {
+      body.password = editForm.value.password
+    }
+
     await $fetch(`/api/admin/users/${editingUser.value.id}`, {
       method: 'PATCH',
       headers: { Authorization: `Bearer ${token}` },
-      body: {
-        name: editForm.value.full_name || editForm.value.username,
-        role: editForm.value.role,
-      },
+      body,
     })
 
     await fetchUsers()
     showEditDialog.value = false
-    showNotification('success', 'Usuario actualizado')
+    showNotification(
+      'success',
+      editForm.value.password ? 'Usuario y contraseña actualizados' : 'Usuario actualizado',
+    )
   } catch (err: any) {
     console.error('Error updating user:', err)
     const message = err.data?.message || err.message || 'Error al actualizar el usuario'
     showNotification('error', message)
   } finally {
     saving.value = false
+  }
+}
+
+const handleSendResetLink = async () => {
+  if (!editingUser.value) return
+
+  sendingReset.value = true
+  try {
+    const token = await getAuthToken()
+    if (!token) {
+      showNotification('error', 'Sesión expirada. Vuelve a iniciar sesión.')
+      return
+    }
+
+    await $fetch(`/api/admin/users/${editingUser.value.id}/reset-password`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    })
+
+    showEditDialog.value = false
+    showNotification('success', `Link de reset enviado a ${editingUser.value.email}`)
+  } catch (err: any) {
+    console.error('Error sending reset link:', err)
+    const message = err.data?.message || err.message || 'Error al enviar el link de reset'
+    showNotification('error', message)
+  } finally {
+    sendingReset.value = false
   }
 }
 
@@ -504,8 +545,8 @@ useHead({
                       id="create-password"
                       v-model="createForm.password"
                       :type="showPassword ? 'text' : 'password'"
-                      placeholder="Mínimo 6 caracteres"
-                      minlength="6"
+                      placeholder="Mínimo 12 caracteres con mayúscula, número y símbolo"
+                      minlength="12"
                       required
                       class="pr-10 rounded-lg"
                     />
@@ -518,6 +559,10 @@ useHead({
                       <Eye v-else class="h-4 w-4" />
                     </button>
                   </div>
+                  <p class="text-xs text-muted-foreground">
+                    Mínimo 12 caracteres. Debe incluir mayúscula, minúscula, número y símbolo.
+                    Se verifica contra filtraciones públicas.
+                  </p>
                 </div>
 
                 <!-- Role -->
@@ -605,6 +650,45 @@ useHead({
                     </SelectContent>
                   </Select>
                 </div>
+
+                <!-- New Password (optional) -->
+                <div class="space-y-2">
+                  <Label for="edit-password">Nueva contraseña</Label>
+                  <div class="relative">
+                    <Input
+                      id="edit-password"
+                      v-model="editForm.password"
+                      :type="showEditPassword ? 'text' : 'password'"
+                      placeholder="Dejar vacío para no cambiar"
+                      minlength="12"
+                      autocomplete="new-password"
+                      class="pr-10 rounded-lg"
+                    />
+                    <button
+                      type="button"
+                      class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      @click="showEditPassword = !showEditPassword"
+                    >
+                      <EyeOff v-if="showEditPassword" class="h-4 w-4" />
+                      <Eye v-else class="h-4 w-4" />
+                    </button>
+                  </div>
+                  <p class="text-xs text-muted-foreground">
+                    Mínimo 12 caracteres con mayúscula, minúscula, número y símbolo.
+                    Se verifica contra filtraciones públicas.
+                  </p>
+                </div>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  class="rounded-lg w-full"
+                  :disabled="sendingReset"
+                  @click="handleSendResetLink"
+                >
+                  <Loader2 v-if="sendingReset" class="h-4 w-4 mr-2 animate-spin" />
+                  Enviar link de reset al usuario
+                </Button>
               </CardContent>
               <CardFooter class="flex justify-end gap-2">
                 <Button type="button" variant="outline" class="rounded-lg" @click="showEditDialog = false">

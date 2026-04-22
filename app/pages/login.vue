@@ -5,8 +5,11 @@ definePageMeta({
   layout: false,
 })
 
-const { signIn, loading, error } = usePortalAuth()
+const supabase = useSupabaseClient()
 const user = useSupabaseUser()
+
+const loading = ref(false)
+const error = ref('')
 
 const showPassword = ref(false)
 const loginAttempts = ref(0)
@@ -17,6 +20,9 @@ const form = ref({
   email: '',
   password: '',
 })
+
+const turnstileToken = ref('')
+const turnstileRef = ref<{ reset: () => void } | null>(null)
 
 const formError = ref('')
 
@@ -66,39 +72,66 @@ const handleSubmit = async () => {
     return
   }
 
-  try {
-    const success = await signIn(email, password)
+  if (!turnstileToken.value) {
+    formError.value = 'Por favor completa la verificación captcha'
+    return
+  }
 
-    if (success) {
+  loading.value = true
+  try {
+    const result = await $fetch<{ success: boolean; session: any }>('/api/auth/login', {
+      method: 'POST',
+      body: {
+        email,
+        password,
+        turnstileToken: turnstileToken.value,
+      },
+    })
+
+    if (result?.success && result.session) {
+      await supabase.auth.setSession({
+        access_token: result.session.access_token,
+        refresh_token: result.session.refresh_token,
+      })
       loginAttempts.value = 0
       navigateTo('/admin')
     } else {
-      loginAttempts.value++
-
-      if (loginAttempts.value >= 5) {
-        isBlocked.value = true
-        blockTimer.value = 60
-
-        const interval = setInterval(() => {
-          blockTimer.value--
-          if (blockTimer.value <= 0) {
-            isBlocked.value = false
-            loginAttempts.value = 0
-            clearInterval(interval)
-          }
-        }, 1000)
-
-        formError.value = 'Demasiados intentos fallidos. Cuenta bloqueada temporalmente.'
-      }
+      formError.value = 'Credenciales inválidas'
     }
-  } catch (err) {
-    console.error('Error en login:', err)
-    formError.value = 'Error al intentar iniciar sesión'
+  } catch (err: any) {
+    loginAttempts.value++
+    turnstileToken.value = ''
+    turnstileRef.value?.reset()
+
+    const message = err?.data?.message || err?.message || 'Error al intentar iniciar sesión'
+    formError.value = message
+
+    if (loginAttempts.value >= 5) {
+      isBlocked.value = true
+      blockTimer.value = 60
+
+      const interval = setInterval(() => {
+        blockTimer.value--
+        if (blockTimer.value <= 0) {
+          isBlocked.value = false
+          loginAttempts.value = 0
+          clearInterval(interval)
+        }
+      }, 1000)
+
+      formError.value = 'Demasiados intentos fallidos. Cuenta bloqueada temporalmente.'
+    }
+  } finally {
+    loading.value = false
   }
 }
 
-const handlePaste = (e: ClipboardEvent) => {
-  console.info('[Security] Paste detected in password field')
+const onTurnstileVerify = (token: string) => {
+  turnstileToken.value = token
+}
+
+const onTurnstileExpired = () => {
+  turnstileToken.value = ''
 }
 
 useHead({
@@ -181,7 +214,6 @@ useHead({
                 required
                 :disabled="isBlocked"
                 class="pr-10 rounded-lg h-10"
-                @paste="handlePaste"
               />
               <button
                 type="button"
@@ -195,8 +227,22 @@ useHead({
             </div>
           </div>
 
+          <!-- Turnstile captcha -->
+          <div class="flex justify-center">
+            <TurnstileWidget
+              ref="turnstileRef"
+              @verify="onTurnstileVerify"
+              @expired="onTurnstileExpired"
+              @error="onTurnstileExpired"
+            />
+          </div>
+
           <!-- Submit Button -->
-          <Button type="submit" class="w-full rounded-lg h-10" :disabled="loading || isBlocked">
+          <Button
+            type="submit"
+            class="w-full rounded-lg h-10"
+            :disabled="loading || isBlocked || !turnstileToken"
+          >
             <Loader2 v-if="loading" class="h-4 w-4 animate-spin mr-2" />
             <ShieldAlert v-else-if="isBlocked" class="h-4 w-4 mr-2" />
             {{ isBlocked ? 'Bloqueado' : 'Iniciar Sesion' }}

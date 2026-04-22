@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import { verifyTurnstile } from '../../utils/turnstile'
 
 // Rate limiting simple en memoria (en producción usar Redis)
 const loginAttempts = new Map<string, { count: number; lastAttempt: number; blocked: boolean }>()
@@ -85,14 +86,22 @@ export default defineEventHandler(async (event) => {
   }
   
   const body = await readBody(event)
-  const { email, password } = body
-  
+  const { email, password, turnstileToken } = body
+
   // Validaciones básicas
   if (!email || !password) {
     throw createError({
       statusCode: 400,
       message: 'Email y contraseña son requeridos'
     })
+  }
+
+  // Verificar captcha ANTES de tocar credenciales
+  const captcha = await verifyTurnstile(turnstileToken, ip)
+  if (!captcha.ok) {
+    recordFailedAttempt(ip)
+    console.warn(`[SECURITY] Turnstile failed for ${email} from ${ip}`)
+    throw createError({ statusCode: 400, message: captcha.message })
   }
   
   // Validar formato de email
@@ -155,9 +164,14 @@ export default defineEventHandler(async (event) => {
     // Log de acceso exitoso
     console.info(`[SECURITY] Successful login for ${email} (${portalUser.role}) from IP ${ip}`)
     
-    // Registrar en tabla de auditoría (si existe)
+    // Registrar en tabla de auditoría vía service_role (RLS bloquea a authenticated)
     try {
-      await supabase.from('audit_logs').insert({
+      const supabaseAdmin = createClient(
+        config.public.supabaseUrl,
+        config.supabaseServiceKey,
+        { auth: { autoRefreshToken: false, persistSession: false } }
+      )
+      await supabaseAdmin.from('audit_logs').insert({
         user_id: portalUser.id,
         action: 'login',
         ip_address: ip,
